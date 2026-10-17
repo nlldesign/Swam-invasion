@@ -76,13 +76,13 @@
       background:
         linear-gradient(
           rgba(18, 16, 16, 0) 50%,
-          rgba(0, 0, 0, 0.32) 50%
+          rgba(0, 0, 0, 0.3) 50%
         ),
         linear-gradient(
           90deg,
-          rgba(255, 0, 0, 0.025),
+          rgba(255, 0, 0, 0.02),
           rgba(0, 255, 0, 0.01),
-          rgba(0, 0, 255, 0.025)
+          rgba(0, 0, 255, 0.02)
         );
       background-size: 100% 3px, 6px 100%;
       pointer-events: none;
@@ -91,48 +91,42 @@
 
     .glow-cyan {
       box-shadow:
-        0 0 16px rgba(6, 182, 212, 0.4),
-        inset 0 0 10px rgba(6, 182, 212, 0.15);
+        0 0 14px rgba(6, 182, 212, 0.35),
+        inset 0 0 8px rgba(6, 182, 212, 0.12);
     }
 
     .glow-rose {
       box-shadow:
-        0 0 20px rgba(244, 63, 94, 0.55),
-        inset 0 0 12px rgba(244, 63, 94, 0.2);
+        0 0 18px rgba(244, 63, 94, 0.5),
+        inset 0 0 10px rgba(244, 63, 94, 0.18);
     }
 
     .glow-amber {
       box-shadow:
-        0 0 16px rgba(245, 158, 11, 0.45),
-        inset 0 0 8px rgba(245, 158, 11, 0.15);
-    }
-
-    .glow-emerald {
-      box-shadow:
-        0 0 16px rgba(16, 185, 129, 0.4),
-        inset 0 0 8px rgba(16, 185, 129, 0.15);
+        0 0 14px rgba(245, 158, 11, 0.4),
+        inset 0 0 8px rgba(245, 158, 11, 0.12);
     }
 
     .neon-text-cyan {
       text-shadow:
         0 0 10px rgba(6, 182, 212, 0.8),
-        0 0 22px rgba(6, 182, 212, 0.45);
+        0 0 20px rgba(6, 182, 212, 0.4);
     }
 
     .neon-text-rose {
       text-shadow:
         0 0 10px rgba(244, 63, 94, 0.85),
-        0 0 24px rgba(244, 63, 94, 0.5);
+        0 0 22px rgba(244, 63, 94, 0.5);
     }
 
     @keyframes pulseCrimsonStorm {
       0%, 100% {
         opacity: 0.35;
-        box-shadow: inset 0 0 70px rgba(225, 29, 72, 0.45);
+        box-shadow: inset 0 0 65px rgba(225, 29, 72, 0.45);
       }
       50% {
-        opacity: 0.8;
-        box-shadow: inset 0 0 150px rgba(225, 29, 72, 0.85);
+        opacity: 0.78;
+        box-shadow: inset 0 0 140px rgba(225, 29, 72, 0.85);
       }
     }
 
@@ -140,25 +134,21 @@
       background: radial-gradient(
         circle,
         transparent 42%,
-        rgba(225, 29, 72, 0.58) 100%
+        rgba(225, 29, 72, 0.55) 100%
       );
       animation: pulseCrimsonStorm 1.25s infinite ease-in-out;
     }
 
     .turret-btn {
-      transition: all 0.15s ease-in-out;
-    }
-
-    .turret-btn:hover {
-      transform: translateY(-2px) scale(1.03);
+      transition: all 0.12s ease-in-out;
     }
 
     .turret-btn:active {
-      transform: translateY(1px) scale(0.96);
+      transform: scale(0.94);
     }
 
     .custom-scroll::-webkit-scrollbar {
-      width: 6px;
+      width: 5px;
     }
 
     .custom-scroll::-webkit-scrollbar-thumb {
@@ -172,7 +162,7 @@
   <!-- Canvas Principal 3D (Three.js) -->
   <canvas id="gameCanvas"></canvas>
 
-  <!-- Canvas 2D Tático (Dano Flutuante, +XP, Barras de Boss e Alertas) -->
+  <!-- Canvas 2D Tático (Dano Flutuante, +XP, Barras de Vida e Alertas) -->
   <canvas id="fxCanvas"></canvas>
 
   <!-- Vinheta Pulsante de Hiper-Infestação (>200% Agressividade) -->
@@ -184,446 +174,467 @@
   <!-- Linhas de Varredura CRT (Scanlines) -->
   <div class="fixed inset-0 crt-scanlines"></div>
 
-  <!-- HUD Tático Principal -->
+  <!-- HUD Tático Principal (Ultra-Compacto no Mobile, Completo no Desktop) -->
   <div
     id="hudContainer"
     class="fixed inset-0 pointer-events-none z-20 flex flex-col
-           justify-between p-2 sm:p-3.5 hidden"
+           justify-between p-1.5 sm:p-3 hidden"
   >
-    <!-- Topo: Status do Herói, da Onda/Agressividade e da Colônia -->
-    <div class="flex flex-col gap-2 w-full max-w-7xl mx-auto">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 items-start">
+    <!-- TOPO DO HUD -->
+    <div class="flex flex-col gap-1 sm:gap-2 w-full max-w-7xl mx-auto">
 
-        <!-- Painel Esquerdo: Comandante & Núcleo da Colônia -->
-        <div
-          class="bg-slate-900/85 backdrop-blur-md border border-cyan-500/40
-                 rounded-xl p-2.5 pointer-events-auto glow-cyan"
-        >
-          <!-- Barra de Vida do Herói -->
-          <div class="flex items-center justify-between mb-1">
-            <span
-              class="font-orbitron text-xs font-bold text-emerald-400
-                     flex items-center gap-1.5"
-            >
-              <i class="fa-solid fa-user-astronaut"></i>
-              <span>COMANDANTE</span>
+      <!-- Layout Responsivo: 1 Barra Compacta no Mobile / 3 Cards no Desktop -->
+      <div
+        class="bg-slate-950/85 backdrop-blur-md border border-cyan-500/35
+               rounded-xl p-1.5 sm:p-2.5 pointer-events-auto shadow-lg"
+      >
+        <!-- Linha 1: Barras de Vida (Herói e Colônia Lado a Lado no Mobile) -->
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-2 items-center">
+
+          <!-- Status do Comandante -->
+          <div class="flex flex-col">
+            <div class="flex items-center justify-between text-[10px] sm:text-xs mb-0.5">
               <span
-                id="hudLevel"
-                class="text-white bg-emerald-600/70 px-1.5 py-0.5
-                       rounded text-[10px]"
-              >NV. 1</span>
-            </span>
-            <span
-              id="hudPlayerHpText"
-              class="text-xs font-orbitron font-bold text-emerald-300"
-            >120 / 120</span>
-          </div>
-          <div
-            class="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden
-                   mb-2 border border-emerald-500/30"
-          >
+                class="font-orbitron font-bold text-emerald-400
+                       flex items-center gap-1 truncate"
+              >
+                <i class="fa-solid fa-user-astronaut"></i>
+                <span class="hidden xs:inline">HERÓI</span>
+                <span
+                  id="hudLevel"
+                  class="text-white bg-emerald-600/80 px-1 py-0.2
+                         rounded text-[9px] sm:text-[10px]"
+                >NV.1</span>
+              </span>
+              <span
+                id="hudPlayerHpText"
+                class="font-orbitron font-bold text-emerald-300 text-[10px] sm:text-xs"
+              >110/110</span>
+            </div>
             <div
-              id="hudPlayerHpBar"
-              class="h-full bg-gradient-to-r from-emerald-500 to-cyan-400
-                     transition-all duration-150"
-              style="width: 100%"
-            ></div>
+              class="w-full h-2 sm:h-2.5 bg-slate-900 rounded-full
+                     overflow-hidden border border-emerald-500/30"
+            >
+              <div
+                id="hudPlayerHpBar"
+                class="h-full bg-gradient-to-r from-emerald-500 to-cyan-400
+                       transition-all duration-150"
+                style="width: 100%"
+              ></div>
+            </div>
           </div>
 
-          <!-- Barra de Integridade da Colônia + Escudo -->
-          <div class="flex items-center justify-between mb-1">
-            <span
-              class="font-orbitron text-xs font-bold text-cyan-400
-                     flex items-center gap-1.5"
-            >
-              <i class="fa-solid fa-landmark-dome"></i>
-              <span>NÚCLEO COLONIAL</span>
-            </span>
-            <div class="flex items-center gap-2">
+          <!-- Status do Núcleo Colonial + Escudo -->
+          <div class="flex flex-col">
+            <div class="flex items-center justify-between text-[10px] sm:text-xs mb-0.5">
               <span
-                id="hudBaseShieldText"
-                class="text-[10px] font-orbitron font-bold text-sky-300"
-              >ESCUDO: 0</span>
+                class="font-orbitron font-bold text-cyan-400
+                       flex items-center gap-1 truncate"
+              >
+                <i class="fa-solid fa-landmark-dome"></i>
+                <span>BASE</span>
+                <span
+                  id="hudBaseShieldText"
+                  class="text-[9px] text-sky-300 hidden sm:inline"
+                >(ESC: 0)</span>
+              </span>
               <span
                 id="hudBaseHpText"
-                class="text-xs font-orbitron font-bold text-cyan-200"
-              >1500 / 1500</span>
-            </div>
-          </div>
-          <div
-            class="relative w-full h-3 bg-slate-950 rounded-full
-                   overflow-hidden border border-cyan-500/30"
-          >
-            <div
-              id="hudBaseHpBar"
-              class="h-full bg-gradient-to-r from-cyan-600 to-teal-400
-                     transition-all duration-150"
-              style="width: 100%"
-            ></div>
-            <div
-              id="hudBaseShieldBar"
-              class="absolute top-0 left-0 h-full bg-sky-300/65
-                     transition-all duration-150"
-              style="width: 0%"
-            ></div>
-          </div>
-        </div>
-
-        <!-- Painel Central: Cronômetro, Onda, Agressividade e XP -->
-        <div
-          class="bg-slate-900/90 backdrop-blur-md border border-slate-700/80
-                 rounded-xl p-2.5 flex flex-col items-center justify-center
-                 pointer-events-auto shadow-xl"
-        >
-          <div class="flex items-center gap-3 sm:gap-5">
-            <div class="text-center">
-              <div
-                class="text-[10px] uppercase tracking-widest
-                       text-slate-400 font-bold"
-              >TEMPO</div>
-              <div
-                id="hudTimer"
-                class="font-orbitron text-base sm:text-lg font-black text-white"
-              >00:00</div>
-            </div>
-
-            <div class="h-7 w-[1px] bg-slate-700"></div>
-
-            <div class="text-center">
-              <div
-                id="hudWave"
-                class="text-[10px] uppercase tracking-widest
-                       text-cyan-400 font-orbitron font-bold"
-              >ONDA 1</div>
-              <div
-                id="hudWaveCountdown"
-                class="font-orbitron text-base sm:text-lg font-black
-                       text-cyan-200"
-              >01:00</div>
-            </div>
-
-            <div class="h-7 w-[1px] bg-slate-700"></div>
-
-            <div class="text-center">
-              <div
-                class="text-[10px] uppercase tracking-widest
-                       text-rose-400 font-bold"
-              >AGRESSIVIDADE</div>
-              <div class="flex items-center justify-center gap-1">
-                <span
-                  id="hudAggro"
-                  class="font-orbitron text-base sm:text-lg font-black
-                         text-rose-400"
-                >100%</span>
-                <span
-                  id="hudBaseThreatTag"
-                  class="hidden text-[9px] font-orbitron bg-amber-950/90
-                         text-amber-300 px-1 py-0.5 rounded border
-                         border-amber-500/40"
-                >BASE +0%</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Barra de Experiência Automática -->
-          <div class="w-full mt-2">
-            <div
-              class="flex justify-between text-[10px] font-orbitron
-                     text-slate-300 font-semibold mb-0.5"
-            >
-              <span class="text-cyan-300">AUTO-XP (SEM ORBES NO CHÃO)</span>
-              <span id="hudXpText" class="text-amber-300">0 / 35 XP</span>
+                class="font-orbitron font-bold text-cyan-200 text-[10px] sm:text-xs"
+              >1200/1200</span>
             </div>
             <div
-              class="w-full h-2 bg-slate-950 rounded-full overflow-hidden
-                     border border-cyan-500/30"
+              class="relative w-full h-2 sm:h-2.5 bg-slate-900 rounded-full
+                     overflow-hidden border border-cyan-500/30"
             >
               <div
-                id="hudXpBar"
-                class="h-full bg-gradient-to-r from-cyan-400 via-amber-300
-                       to-emerald-400 transition-all duration-150"
+                id="hudBaseHpBar"
+                class="h-full bg-gradient-to-r from-cyan-600 to-teal-400
+                       transition-all duration-150"
+                style="width: 100%"
+              ></div>
+              <div
+                id="hudBaseShieldBar"
+                class="absolute top-0 left-0 h-full bg-sky-300/70
+                       transition-all duration-150"
                 style="width: 0%"
               ></div>
             </div>
           </div>
 
-          <!-- Badge de Hiper-Infestação (>200%) -->
-          <div
-            id="hyperInfestationBadge"
-            class="hidden mt-1.5 px-3 py-0.5 rounded-full bg-rose-600/90
-                   border border-rose-300 text-white font-orbitron
-                   text-[10px] font-black tracking-wider animate-pulse glow-rose"
-          >
-            <i class="fa-solid fa-biohazard mr-1"></i>
-            HIPER-INFESTAÇÃO ATIVA (ENXAME 2X // ATÉ 1.200 MONSTROS)
-          </div>
-        </div>
-
-        <!-- Painel Direito: Economia de Moedas, Contadores e Controles -->
-        <div
-          class="bg-slate-900/85 backdrop-blur-md border border-amber-500/40
-                 rounded-xl p-2.5 flex items-center justify-between
-                 pointer-events-auto glow-amber"
-        >
-          <div>
-            <div
-              class="text-[10px] uppercase tracking-wider
-                     text-amber-400 font-bold"
-            >MOEDAS / SUCATA DOURADA</div>
-            <div class="flex items-baseline gap-2">
-              <span
-                class="font-orbitron text-xl sm:text-2xl font-black
-                       text-amber-300 flex items-center gap-1.5"
+          <!-- Controles Rápidos & Moedas (Visível na Coluna 3 no Desktop) -->
+          <div class="hidden md:flex items-center justify-between pl-2 border-l border-slate-800">
+            <div class="flex items-center gap-2">
+              <div
+                class="font-orbitron text-lg font-black text-amber-300
+                       flex items-center gap-1"
               >
-                <i class="fa-solid fa-coins text-amber-400 text-base"></i>
-                <span id="hudCoins">60</span>
-              </span>
+                <i class="fa-solid fa-coins text-amber-400 text-sm"></i>
+                <span id="hudCoinsDesktop">50</span>
+              </div>
               <span
                 id="hudCoinMult"
-                class="text-[11px] font-orbitron font-bold text-emerald-300
+                class="text-[10px] font-orbitron font-bold text-emerald-300
                        bg-emerald-950/90 px-1.5 py-0.5 rounded border
                        border-emerald-500/40"
-              >Bônus: 1.0x</span>
+              >1.0x</span>
             </div>
-            <div class="text-[11px] text-slate-300 mt-0.5 font-semibold">
-              Abates: <span id="hudKills" class="text-white font-bold">0</span>
-              <span class="mx-1 text-slate-600">|</span>
-              Enxame:
-              <span id="hudEnemiesCount" class="text-rose-400 font-bold">0</span>
-              <span class="mx-1 text-slate-600">|</span>
-              Ímã:
-              <span id="hudMagnetRange" class="text-pink-400 font-bold">130m</span>
-            </div>
-          </div>
 
-          <div class="flex flex-col items-end gap-1.5">
             <div class="flex items-center gap-1.5">
               <button
-                id="btnCameraMode"
-                title="Alternar Ângulo de Câmera [V]"
-                class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700
-                       border border-cyan-500/40 text-cyan-300 text-xs
+                id="btnCameraModeDesktop"
+                title="Alternar Câmera [V]"
+                class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700
+                       border border-cyan-500/40 text-cyan-300 text-[11px]
                        font-orbitron font-bold transition"
               >
                 <i class="fa-solid fa-video mr-1"></i>
-                <span id="camModeLabel">3D</span>
+                <span class="camModeLabel">3D</span>
+              </button>
+              <button
+                id="btnToggleAudioDesktop"
+                title="Alternar Som"
+                class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700
+                       border border-slate-600 text-cyan-300 text-[11px]
+                       font-bold transition"
+              >
+                <i class="audioIcon fa-solid fa-volume-high"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Linha 2: Telemetria Compacta (Tempo, Onda, Agro, Moedas, Limites) -->
+        <div
+          class="flex flex-wrap items-center justify-between gap-x-2 gap-y-1
+                 mt-1.5 pt-1.5 border-t border-slate-800/90
+                 text-[10px] sm:text-xs font-orbitron"
+        >
+          <!-- Esquerda: Tempo, Onda e Agro -->
+          <div class="flex items-center gap-2 sm:gap-3">
+            <span class="text-slate-300 font-bold">
+              <i class="fa-regular fa-clock text-cyan-400 mr-0.5"></i>
+              <span id="hudTimer">00:00</span>
+            </span>
+
+            <span class="text-cyan-300 font-bold">
+              <span id="hudWave">ONDA 1</span>
+              <span
+                id="hudWaveCountdown"
+                class="text-slate-400 text-[9px] sm:text-[10px] ml-0.5"
+              >(01:00)</span>
+            </span>
+
+            <span class="text-rose-400 font-black flex items-center gap-1">
+              <i class="fa-solid fa-fire-flame-curved"></i>
+              <span id="hudAggro">100%</span>
+              <span
+                id="hudBaseThreatTag"
+                class="hidden text-[8px] sm:text-[9px] bg-amber-950
+                       text-amber-300 px-1 rounded border border-amber-500/40"
+              >+0%</span>
+            </span>
+          </div>
+
+          <!-- Direita: Moedas (Mobile), Limites de Torretas/Guardas e Botões -->
+          <div class="flex items-center gap-2 sm:gap-3 ml-auto">
+            <!-- Moedas no Mobile -->
+            <span class="md:hidden text-amber-300 font-black flex items-center gap-1">
+              <i class="fa-solid fa-coins text-amber-400"></i>
+              <span id="hudCoins">50</span>
+            </span>
+
+            <!-- Contador de Torretas (Limitadas) -->
+            <span
+              id="hudTurretCap"
+              class="text-cyan-300 font-bold bg-slate-900 px-1.5 py-0.5
+                     rounded border border-cyan-500/30 text-[9px] sm:text-[11px]"
+              title="Limite de Torretas Ativas"
+            >
+              <i class="fa-solid fa-tower-observation text-cyan-400 mr-0.5"></i>
+              <span id="hudTurretsCount">0/6</span>
+            </span>
+
+            <!-- Contador de Guardas (Limitados) -->
+            <span
+              id="hudGuardCap"
+              class="text-emerald-300 font-bold bg-slate-900 px-1.5 py-0.5
+                     rounded border border-emerald-500/30 text-[9px] sm:text-[11px]"
+              title="Esquadrão de Guardas Coloniais"
+            >
+              <i class="fa-solid fa-user-shield text-emerald-400 mr-0.5"></i>
+              <span id="hudGuardsCount">0/4</span>
+            </span>
+
+            <!-- Abates e Inimigos (Oculto em telas muito estreitas) -->
+            <span class="hidden sm:inline text-slate-300 font-sans font-bold text-xs">
+              Abates: <strong id="hudKills" class="text-white">0</strong> |
+              Vivos: <strong id="hudEnemiesCount" class="text-rose-400">0</strong> |
+              Ímã: <strong id="hudMagnetRange" class="text-pink-400">125m</strong>
+            </span>
+
+            <!-- Botões Câmera e Som no Mobile -->
+            <div class="flex md:hidden items-center gap-1">
+              <button
+                id="btnCameraMode"
+                class="px-1.5 py-0.5 rounded bg-slate-800 border
+                       border-cyan-500/40 text-cyan-300 text-[9px] font-bold"
+              >
+                <span class="camModeLabel">3D</span>
               </button>
               <button
                 id="btnToggleAudio"
-                title="Alternar Som"
-                class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700
-                       border border-slate-600 text-cyan-300 text-xs
-                       font-bold transition"
+                class="px-1.5 py-0.5 rounded bg-slate-800 border
+                       border-slate-600 text-cyan-300 text-[9px]"
               >
-                <i id="audioIcon" class="fa-solid fa-volume-high"></i>
+                <i class="audioIcon fa-solid fa-volume-high"></i>
               </button>
             </div>
-            <span class="text-[9px] font-orbitron text-slate-400">
-              SCROLL: ZOOM | ARRASTAR: GIRAR
-            </span>
           </div>
         </div>
 
+        <!-- Linha 3: Barra Fina de Auto-XP -->
+        <div class="w-full mt-1.5 flex items-center gap-2">
+          <div
+            class="flex-1 h-1.5 bg-slate-900 rounded-full
+                   overflow-hidden border border-cyan-500/25"
+          >
+            <div
+              id="hudXpBar"
+              class="h-full bg-gradient-to-r from-cyan-400 via-amber-300
+                     to-emerald-400 transition-all duration-150"
+              style="width: 0%"
+            ></div>
+          </div>
+          <span
+            id="hudXpText"
+            class="text-[9px] font-orbitron text-amber-300 font-bold shrink-0"
+          >0/45 XP</span>
+        </div>
+
+        <!-- Badge de Hiper-Infestação (>200%) -->
+        <div
+          id="hyperInfestationBadge"
+          class="hidden mt-1 py-0.5 px-2 rounded-full bg-rose-600/90
+                 border border-rose-300 text-white font-orbitron
+                 text-[9px] sm:text-[10px] font-black text-center
+                 tracking-wider animate-pulse"
+        >
+          <i class="fa-solid fa-biohazard mr-1"></i>
+          HIPER-INFESTAÇÃO 2X ATIVA (ENXAME DUPLICADO)
+        </div>
       </div>
 
-      <!-- Banner Holográfico de Sobrecarga da Base (Level Up de Defesa) -->
+      <!-- Banner Compacto de Sobrecarga da Base -->
       <div
         id="baseUpgradeBanner"
-        class="hidden self-center bg-gradient-to-r from-cyan-950/95
-               via-slate-900/95 to-rose-950/95 border-2 border-cyan-400
-               rounded-2xl px-5 py-2.5 shadow-2xl backdrop-blur-xl
-               flex items-center gap-4 text-left max-w-xl glow-cyan"
+        class="hidden self-center bg-slate-950/95 border border-cyan-400
+               rounded-xl px-3 py-1.5 shadow-xl backdrop-blur-md
+               flex items-center gap-2.5 max-w-md glow-cyan"
       >
-        <div
-          class="w-11 h-11 rounded-xl bg-cyan-500/20 border border-cyan-300
-                 flex items-center justify-center shrink-0 animate-bounce"
-        >
-          <i class="fa-solid fa-tower-broadcast text-xl text-cyan-300"></i>
-        </div>
-        <div>
-          <div
-            class="text-[10px] font-orbitron uppercase tracking-widest
-                   text-cyan-300 font-bold"
-          >NOVA CINÉTICA DISPARADA // SUBSISTEMA DA COLÔNIA ONLINE</div>
+        <i
+          class="fa-solid fa-tower-broadcast text-base sm:text-lg
+                 text-cyan-300 animate-bounce"
+        ></i>
+        <div class="leading-tight">
           <div
             id="baseUpgradeModule"
-            class="text-sm sm:text-base font-orbitron font-black text-white"
-          >DOMO HOLOGRÁFICO</div>
+            class="text-[10px] sm:text-xs font-orbitron font-black text-white"
+          >DOMO HOLOGRÁFICO ONLINE</div>
           <div
             id="baseUpgradeThreat"
-            class="text-xs font-bold text-rose-400"
-          >
-            <i class="fa-solid fa-triangle-exclamation mr-1"></i>
-            PULSO DETECTADO: AGRESSIVIDADE DO ENXAME AUMENTOU!
-          </div>
+            class="text-[9px] sm:text-[11px] font-bold text-rose-400"
+          >EMISSÃO +28% AGRO: O ENXAME FICOU MAIS FEROZ!</div>
         </div>
       </div>
 
-      <!-- Banner Geral de Alertas de Horda / Eventos -->
+      <!-- Banner Compacto de Eventos / Horda -->
       <div
         id="eventBanner"
-        class="hidden self-center bg-slate-950/90 border-2 border-rose-500/80
-               text-white px-5 py-1.5 rounded-xl shadow-2xl backdrop-blur-md
-               text-center max-w-lg animate-pulse"
+        class="hidden self-center bg-slate-950/90 border border-rose-500/80
+               text-white px-3.5 py-1 rounded-xl shadow-lg backdrop-blur-md
+               text-center max-w-md"
       >
         <div
           id="eventBannerTitle"
-          class="font-orbitron text-xs sm:text-sm font-black
+          class="font-orbitron text-[10px] sm:text-xs font-black
                  text-rose-400 tracking-wider uppercase"
         >ALERTA DE HORDA</div>
         <div
           id="eventBannerDesc"
-          class="text-xs text-slate-200 font-semibold"
-        >Múltiplas matilhas em formação de pinça!</div>
+          class="text-[10px] sm:text-xs text-slate-200 font-semibold"
+        >Múltiplas matilhas detectadas!</div>
       </div>
+
     </div>
 
-    <!-- Rodapé: Arsenal Ativo, Construção de Torretas e Mini-Radar -->
+    <!-- RODAPÉ DO HUD: Armas, 4 Torretas + Guarda + Reparo e Mini-Radar -->
     <div
-      class="flex flex-col md:flex-row items-center md:items-end
-             justify-between w-full max-w-7xl mx-auto gap-2"
+      class="flex items-end justify-between w-full max-w-7xl mx-auto gap-2"
     >
-      <!-- Esquerda: Armas Evolutivas Ativas -->
-      <div class="hidden sm:flex flex-col gap-1.5">
+      <!-- Esquerda (Desktop): Armas Evolutivas Ativas -->
+      <div class="hidden lg:flex flex-col gap-1.5">
         <div
           id="weaponsList"
-          class="flex flex-wrap gap-1.5 bg-slate-900/85 backdrop-blur-md
-                 p-2 rounded-xl border border-slate-700/80 max-w-xs
+          class="flex flex-wrap gap-1 bg-slate-950/85 backdrop-blur-md
+                 p-1.5 rounded-xl border border-slate-800 max-w-xs
                  pointer-events-auto"
         ></div>
         <div
-          class="text-[10px] text-slate-400 bg-slate-900/80 px-2.5 py-1
-                 rounded-lg border border-slate-800 hidden lg:inline-block
-                 pointer-events-auto"
+          class="text-[10px] text-slate-400 bg-slate-950/80 px-2.5 py-1
+                 rounded-lg border border-slate-800 pointer-events-auto"
         >
-          <span class="text-cyan-400 font-bold">WASD / Setas</span> Mover |
-          <span class="text-amber-400 font-bold">1-5</span> Torretas & Reparo |
-          <span class="text-emerald-400 font-bold">V</span> Câmera
+          <span class="text-cyan-400 font-bold">WASD</span> Mover |
+          <span class="text-amber-400 font-bold">1-4</span> Torretas |
+          <span class="text-emerald-400 font-bold">5</span> Guarda |
+          <span class="text-teal-400 font-bold">6</span> Reparar
         </div>
       </div>
 
-      <!-- Centro-Baixo: Doca de Construção das 4 Torretas + Reparo -->
+      <!-- Centro-Baixo: Doca Compacta (6 Botões: 4 Torretas, Guarda e Reparo) -->
       <div
-        class="flex flex-wrap items-center justify-center gap-1.5
-               bg-slate-950/90 backdrop-blur-md p-1.5 sm:p-2 rounded-2xl
-               border border-cyan-500/40 pointer-events-auto shadow-2xl"
+        class="w-full sm:w-auto grid grid-cols-6 sm:flex sm:flex-wrap
+               items-center justify-center gap-1 sm:gap-1.5
+               bg-slate-950/90 backdrop-blur-md p-1 sm:p-1.5 rounded-xl
+               border border-cyan-500/40 pointer-events-auto shadow-2xl mx-auto"
       >
         <!-- [1] Gatling Pesada -->
         <button
           id="btnBuildGatling"
-          title="Alta cadência e tiro contínuo duplo (30 Moedas)"
-          class="turret-btn flex flex-col items-center px-2.5 py-1.5
-                 rounded-xl bg-slate-900 hover:bg-cyan-950/80
-                 border border-cyan-500/40 hover:border-cyan-300"
+          title="Torreta Gatling Dupla (35 Moedas)"
+          class="turret-btn flex flex-col items-center justify-center
+                 py-1 px-1 sm:px-2.5 sm:py-1.5 rounded-lg bg-slate-900
+                 hover:bg-cyan-950/80 border border-cyan-500/40"
         >
           <div
-            class="flex items-center gap-1 text-cyan-300 font-orbitron
-                   text-[10px] sm:text-[11px] font-bold"
+            class="flex items-center gap-0.5 sm:gap-1 text-cyan-300
+                   font-orbitron text-[8px] sm:text-[10px] font-bold"
           >
             <i class="fa-solid fa-crosshairs text-cyan-400"></i>
-            <span>[1] GATLING</span>
+            <span>GATLING</span>
           </div>
-          <span class="text-[10px] text-amber-300 font-orbitron font-bold">
-            30 <i class="fa-solid fa-coins text-[8px]"></i>
+          <span class="text-[8px] sm:text-[10px] text-amber-300 font-orbitron font-bold">
+            35<i class="fa-solid fa-coins text-[7px] ml-0.5"></i>
           </span>
         </button>
 
         <!-- [2] Canhão Railgun -->
         <button
           id="btnBuildRailgun"
-          title="Disparos perfurantes em linha de alta voltagem (45 Moedas)"
-          class="turret-btn flex flex-col items-center px-2.5 py-1.5
-                 rounded-xl bg-slate-900 hover:bg-purple-950/80
-                 border border-purple-500/40 hover:border-purple-300"
+          title="Canhão Perfurante Railgun (55 Moedas)"
+          class="turret-btn flex flex-col items-center justify-center
+                 py-1 px-1 sm:px-2.5 sm:py-1.5 rounded-lg bg-slate-900
+                 hover:bg-purple-950/80 border border-purple-500/40"
         >
           <div
-            class="flex items-center gap-1 text-purple-300 font-orbitron
-                   text-[10px] sm:text-[11px] font-bold"
+            class="flex items-center gap-0.5 sm:gap-1 text-purple-300
+                   font-orbitron text-[8px] sm:text-[10px] font-bold"
           >
             <i class="fa-solid fa-bolt text-purple-400"></i>
-            <span>[2] RAILGUN</span>
+            <span>RAILGUN</span>
           </div>
-          <span class="text-[10px] text-amber-300 font-orbitron font-bold">
-            45 <i class="fa-solid fa-coins text-[8px]"></i>
+          <span class="text-[8px] sm:text-[10px] text-amber-300 font-orbitron font-bold">
+            55<i class="fa-solid fa-coins text-[7px] ml-0.5"></i>
           </span>
         </button>
 
         <!-- [3] Torreta de Chamas -->
         <button
           id="btnBuildFlame"
-          title="Projéteis incendiários em cone com Burn DOT (40 Moedas)"
-          class="turret-btn flex flex-col items-center px-2.5 py-1.5
-                 rounded-xl bg-slate-900 hover:bg-orange-950/80
-                 border border-orange-500/40 hover:border-orange-300"
+          title="Torreta de Chamas em Cone (45 Moedas)"
+          class="turret-btn flex flex-col items-center justify-center
+                 py-1 px-1 sm:px-2.5 sm:py-1.5 rounded-lg bg-slate-900
+                 hover:bg-orange-950/80 border border-orange-500/40"
         >
           <div
-            class="flex items-center gap-1 text-orange-300 font-orbitron
-                   text-[10px] sm:text-[11px] font-bold"
+            class="flex items-center gap-0.5 sm:gap-1 text-orange-300
+                   font-orbitron text-[8px] sm:text-[10px] font-bold"
           >
             <i class="fa-solid fa-fire text-orange-400"></i>
-            <span>[3] CHAMAS</span>
+            <span>CHAMAS</span>
           </div>
-          <span class="text-[10px] text-amber-300 font-orbitron font-bold">
-            40 <i class="fa-solid fa-coins text-[8px]"></i>
+          <span class="text-[8px] sm:text-[10px] text-amber-300 font-orbitron font-bold">
+            45<i class="fa-solid fa-coins text-[7px] ml-0.5"></i>
           </span>
         </button>
 
         <!-- [4] Torreta Criogênica -->
         <button
           id="btnBuildCryo"
-          title="Pulsos de congelamento que reduzem velocidade em 55% (35 Moedas)"
-          class="turret-btn flex flex-col items-center px-2.5 py-1.5
-                 rounded-xl bg-slate-900 hover:bg-teal-950/80
-                 border border-teal-500/40 hover:border-teal-300"
+          title="Torreta Criogênica 55% Slow (40 Moedas)"
+          class="turret-btn flex flex-col items-center justify-center
+                 py-1 px-1 sm:px-2.5 sm:py-1.5 rounded-lg bg-slate-900
+                 hover:bg-teal-950/80 border border-teal-500/40"
         >
           <div
-            class="flex items-center gap-1 text-teal-300 font-orbitron
-                   text-[10px] sm:text-[11px] font-bold"
+            class="flex items-center gap-0.5 sm:gap-1 text-teal-300
+                   font-orbitron text-[8px] sm:text-[10px] font-bold"
           >
             <i class="fa-solid fa-snowflake text-teal-400"></i>
-            <span>[4] CRIO</span>
+            <span>CRIO</span>
           </div>
-          <span class="text-[10px] text-amber-300 font-orbitron font-bold">
-            35 <i class="fa-solid fa-coins text-[8px]"></i>
+          <span class="text-[8px] sm:text-[10px] text-amber-300 font-orbitron font-bold">
+            40<i class="fa-solid fa-coins text-[7px] ml-0.5"></i>
           </span>
         </button>
 
-        <!-- [5] Reparar Colônia -->
+        <!-- [5] Recrutar Guarda Colonial -->
         <button
-          id="btnRepairBase"
-          title="Reparar integridade do Centro de Comando (+300 HP)"
-          class="turret-btn flex flex-col items-center px-2.5 py-1.5
-                 rounded-xl bg-slate-900 hover:bg-emerald-950/80
-                 border border-emerald-500/50 hover:border-emerald-300"
+          id="btnHireGuard"
+          title="Recrutar Guarda Fuzileiro Colonial (40 Moedas)"
+          class="turret-btn flex flex-col items-center justify-center
+                 py-1 px-1 sm:px-2.5 sm:py-1.5 rounded-lg bg-slate-900
+                 hover:bg-emerald-950/80 border border-emerald-500/40"
         >
           <div
-            class="flex items-center gap-1 text-emerald-300 font-orbitron
-                   text-[10px] sm:text-[11px] font-bold"
+            class="flex items-center gap-0.5 sm:gap-1 text-emerald-300
+                   font-orbitron text-[8px] sm:text-[10px] font-bold"
           >
-            <i class="fa-solid fa-wrench text-emerald-400"></i>
-            <span>[5] REPARAR</span>
+            <i class="fa-solid fa-user-shield text-emerald-400"></i>
+            <span>GUARDA</span>
           </div>
-          <span class="text-[10px] text-amber-300 font-orbitron font-bold">
-            20 <i class="fa-solid fa-coins text-[8px]"></i>
+          <span class="text-[8px] sm:text-[10px] text-amber-300 font-orbitron font-bold">
+            40<i class="fa-solid fa-coins text-[7px] ml-0.5"></i>
+          </span>
+        </button>
+
+        <!-- [6] Reparar Colônia -->
+        <button
+          id="btnRepairBase"
+          title="Reparar Centro de Comando (+250 HP)"
+          class="turret-btn flex flex-col items-center justify-center
+                 py-1 px-1 sm:px-2.5 sm:py-1.5 rounded-lg bg-slate-900
+                 hover:bg-sky-950/80 border border-sky-500/40"
+        >
+          <div
+            class="flex items-center gap-0.5 sm:gap-1 text-sky-300
+                   font-orbitron text-[8px] sm:text-[10px] font-bold"
+          >
+            <i class="fa-solid fa-wrench text-sky-400"></i>
+            <span>REPARO</span>
+          </div>
+          <span class="text-[8px] sm:text-[10px] text-amber-300 font-orbitron font-bold">
+            25<i class="fa-solid fa-coins text-[7px] ml-0.5"></i>
           </span>
         </button>
       </div>
 
       <!-- Direita: Mini-Radar Tático 5000x5000 -->
       <div
-        class="hidden sm:flex bg-slate-900/90 backdrop-blur-md p-1.5
+        class="hidden sm:flex bg-slate-950/90 backdrop-blur-md p-1.5
                rounded-xl border border-cyan-500/40 pointer-events-auto
                flex-col items-center glow-cyan"
       >
         <span
-          class="text-[9px] font-orbitron text-cyan-400
-                 tracking-wider mb-1 font-bold"
+          class="text-[8px] font-orbitron text-cyan-400
+                 tracking-wider mb-0.5 font-bold"
         >RADAR 5000x5000</span>
-        <div class="relative w-28 h-28 rounded-lg overflow-hidden border border-slate-700">
+        <div class="relative w-24 h-24 rounded-lg overflow-hidden border border-slate-700">
           <canvas
             id="minimapCanvas"
-            width="112"
-            height="112"
+            width="96"
+            height="96"
             class="w-full h-full block bg-slate-950"
           ></canvas>
           <div
@@ -638,187 +649,180 @@
     </div>
   </div>
 
-  <!-- Joystick Virtual Multitoque Isolado -->
+  <!-- Joystick Virtual Compacto & Flutuante para Mobile (Sem sobrepor botões) -->
   <div
     id="joystickZone"
-    class="fixed bottom-24 left-6 w-32 h-32 rounded-full border-2
-           border-cyan-400/40 bg-slate-900/45 backdrop-blur-sm
-           z-30 hidden pointer-events-auto"
+    class="fixed bottom-16 left-3 w-20 h-20 sm:w-28 sm:h-28 rounded-full
+           border-2 border-cyan-400/35 bg-slate-900/35 backdrop-blur-sm
+           z-25 hidden pointer-events-auto"
   >
     <div
       id="joystickKnob"
-      class="w-12 h-12 rounded-full bg-cyan-400/80 shadow-lg
+      class="w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-cyan-400/75 shadow-lg
              shadow-cyan-500/50 absolute top-1/2 left-1/2
              -translate-x-1/2 -translate-y-1/2 pointer-events-none"
     ></div>
   </div>
 
-  <!-- Cutscene / Prólogo Cinematográfico com Letterbox -->
+  <!-- Cutscene / Prólogo Cinematográfico com Letterbox Responsivo -->
   <div
     id="cutsceneOverlay"
     class="fixed inset-0 z-30 pointer-events-none hidden
            flex flex-col justify-between"
   >
-    <!-- Faixa Preta Superior (Letterbox) -->
+    <!-- Faixa Superior -->
     <div
-      class="w-full h-16 md:h-20 bg-black/95 border-b border-cyan-500/30
-             flex items-center justify-between px-4 sm:px-8 pointer-events-auto"
+      class="w-full h-11 sm:h-16 bg-black/95 border-b border-cyan-500/30
+             flex items-center justify-between px-3 sm:px-8 pointer-events-auto"
     >
-      <div class="flex items-center gap-2.5 text-cyan-400 font-orbitron text-xs">
-        <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
-        <span>TRANSMISSÃO TÁTICA // SETOR COLONIAL ZERO</span>
+      <div class="flex items-center gap-2 text-cyan-400 font-orbitron text-[10px] sm:text-xs">
+        <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+        <span>TRANSMISSÃO TÁTICA // SETOR ZERO</span>
       </div>
       <button
         id="btnSkipCutscene"
-        class="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-rose-600
-               text-xs font-orbitron font-bold text-slate-200 hover:text-white
-               border border-slate-700 hover:border-rose-400 transition
-               flex items-center gap-2"
+        class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-rose-600
+               text-[10px] sm:text-xs font-orbitron font-bold text-slate-200
+               border border-slate-700 transition flex items-center gap-1.5"
       >
         <span>PULAR [ESC]</span>
         <i class="fa-solid fa-forward-fast"></i>
       </button>
     </div>
 
-    <!-- Faixa Preta Inferior (Letterbox + Caixa de Diálogo Ilustrada) -->
+    <!-- Faixa Inferior + Caixa de Diálogo Compacta -->
     <div
-      class="w-full min-h-[155px] md:min-h-[180px] bg-black/95
-             border-t border-cyan-500/40 p-3 sm:p-5
+      class="w-full bg-black/95 border-t border-cyan-500/40 p-2.5 sm:p-5
              flex items-center justify-center pointer-events-auto"
     >
       <div
-        class="max-w-3xl w-full flex items-center gap-4 bg-slate-900/95
-               border-2 border-cyan-500/50 rounded-2xl p-4 shadow-2xl glow-cyan"
+        class="max-w-3xl w-full flex items-center gap-2.5 sm:gap-4
+               bg-slate-900/95 border border-cyan-500/50 rounded-xl
+               p-2.5 sm:p-4 shadow-2xl"
       >
         <div
           id="cutsceneAvatar"
-          class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-amber-500/20
-                 border-2 border-amber-400 flex items-center justify-center
-                 text-2xl sm:text-3xl text-amber-300 shrink-0"
+          class="w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-amber-500/20
+                 border border-amber-400 flex items-center justify-center
+                 text-lg sm:text-2xl text-amber-300 shrink-0"
         >
           <i class="fa-solid fa-helmet-safety"></i>
         </div>
 
         <div class="flex-1 min-w-0">
-          <div class="flex flex-wrap items-center justify-between gap-1 mb-1">
-            <div class="flex items-center gap-2">
-              <span
-                id="cutsceneSpeaker"
-                class="font-orbitron text-xs sm:text-sm font-black
-                       text-amber-400 tracking-wider"
-              >ENGENHEIRA RAMIREZ</span>
-              <span
-                id="cutsceneRole"
-                class="text-[10px] font-orbitron uppercase px-2 py-0.5
-                       rounded bg-slate-800 text-slate-300 border border-slate-700"
-              >ENGENHEIRA-CHEFE</span>
-            </div>
-            <span class="text-[10px] text-slate-400 hidden sm:inline">
-              Espaço ou Clique para continuar
-            </span>
+          <div class="flex items-center gap-2 mb-0.5">
+            <span
+              id="cutsceneSpeaker"
+              class="font-orbitron text-[10px] sm:text-sm font-black
+                     text-amber-400 truncate"
+            >ENGENHEIRA RAMIREZ</span>
+            <span
+              id="cutsceneRole"
+              class="hidden sm:inline text-[9px] font-orbitron uppercase
+                     px-1.5 py-0.5 rounded bg-slate-800 text-slate-300"
+            >ENGENHEIRA-CHEFE</span>
           </div>
           <p
             id="cutsceneText"
-            class="text-xs sm:text-base text-slate-100 font-medium
-                   leading-relaxed"
+            class="text-xs sm:text-sm text-slate-100 leading-snug"
           ></p>
         </div>
 
         <button
           id="btnNextDialog"
-          class="px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500
-                 text-white font-orbitron text-xs font-bold shrink-0
-                 transition flex items-center gap-1.5 shadow-lg"
+          class="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-cyan-600
+                 hover:bg-cyan-500 text-white font-orbitron text-[10px]
+                 sm:text-xs font-bold shrink-0 transition"
         >
-          <span>CONTINUAR</span>
-          <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          <span>AVANÇAR</span>
+          <i class="fa-solid fa-arrow-right ml-1"></i>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Tela Inicial -->
+  <!-- Tela Inicial Responsiva -->
   <div
     id="startModal"
     class="fixed inset-0 z-40 flex items-center justify-center
-           bg-slate-950/90 backdrop-blur-md p-4"
+           bg-slate-950/90 backdrop-blur-md p-3 sm:p-4 overflow-y-auto"
   >
     <div
-      class="max-w-2xl w-full bg-slate-900/95 border-2 border-cyan-500/50
-             rounded-3xl p-6 md:p-8 text-center shadow-2xl glow-cyan"
+      class="max-w-xl w-full bg-slate-900/95 border-2 border-cyan-500/50
+             rounded-2xl sm:rounded-3xl p-4 sm:p-7 text-center
+             shadow-2xl glow-cyan my-auto"
     >
       <div
-        class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full
+        class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full
                bg-cyan-950/90 border border-cyan-400/40 text-cyan-300
-               text-xs font-orbitron mb-3"
+               text-[10px] sm:text-xs font-orbitron mb-2"
       >
         <i class="fa-solid fa-biohazard animate-pulse text-rose-400"></i>
-        <span>PROTOCOLO DE DEFESA COLONIAL // 3D + CAOS TÁTICO</span>
+        <span>DEFESA COLONIAL // 3D + CAOS TÁTICO</span>
       </div>
 
       <h1
-        class="font-orbitron text-3xl md:text-5xl font-black
-               tracking-wider text-white neon-text-cyan mb-1"
+        class="font-orbitron text-2xl sm:text-4xl md:text-5xl font-black
+               tracking-wider text-white neon-text-cyan"
       >
         COLONY SURVIVOR
       </h1>
       <p
-        class="font-orbitron text-xs md:text-sm text-rose-400
-               font-bold tracking-widest uppercase mb-6"
+        class="font-orbitron text-[10px] sm:text-xs text-rose-400
+               font-bold tracking-widest uppercase mb-3 sm:mb-5"
       >
         THE MILLION SWARM
       </p>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-left mb-6">
-        <div class="bg-slate-950/80 border border-cyan-500/30 rounded-xl p-3">
-          <div class="text-cyan-400 font-orbitron text-xs font-bold mb-1">
-            <i class="fa-solid fa-gun mr-1"></i> ARSENAL AUTOMÁTICO
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-left mb-4 sm:mb-6">
+        <div class="bg-slate-950/80 border border-cyan-500/30 rounded-xl p-2.5">
+          <div class="text-cyan-400 font-orbitron text-[10px] sm:text-xs font-bold mb-0.5">
+            <i class="fa-solid fa-tower-observation mr-1"></i> LIMITE DE TORRETAS
           </div>
-          <p class="text-xs text-slate-300 leading-relaxed">
-            Fuzil Duplo, Escopeta Plasma, Lâminas Orbitais, Bobina Tesla e
-            Foguetes. Subir de nível fortalece o Herói sem aumentar o agro!
+          <p class="text-[11px] text-slate-300 leading-tight">
+            Posicione até 6 Torretas (Gatling, Railgun, Chamas, Crio) e recrute
+            Guardas Fuzileiros para proteger o perímetro!
           </p>
         </div>
 
-        <div class="bg-slate-950/80 border border-amber-500/30 rounded-xl p-3">
-          <div class="text-amber-400 font-orbitron text-xs font-bold mb-1">
-            <i class="fa-solid fa-tower-observation mr-1"></i> 4 TORRETAS & BASE
+        <div class="bg-slate-950/80 border border-amber-500/30 rounded-xl p-2.5">
+          <div class="text-amber-400 font-orbitron text-[10px] sm:text-xs font-bold mb-0.5">
+            <i class="fa-solid fa-bolt mr-1"></i> RISCO VS RECOMPENSA
           </div>
-          <p class="text-xs text-slate-300 leading-relaxed">
-            Construa Gatling, Railgun, Chamas e Criogênica. Melhorias da Base
-            disparam uma Nova Cinética, mas enfurecem o enxame!
+          <p class="text-[11px] text-slate-300 leading-tight">
+            Armas do Herói não aumentam o agro. Melhorias da Base disparam uma
+            Nova Cinética, mas enfurecem o enxame!
           </p>
         </div>
 
-        <div class="bg-slate-950/80 border border-rose-500/30 rounded-xl p-3">
-          <div class="text-rose-400 font-orbitron text-xs font-bold mb-1">
+        <div class="bg-slate-950/80 border border-rose-500/30 rounded-xl p-2.5">
+          <div class="text-rose-400 font-orbitron text-[10px] sm:text-xs font-bold mb-0.5">
             <i class="fa-solid fa-skull-crossbones mr-1"></i> HIPER-INFESTAÇÃO
           </div>
-          <p class="text-xs text-slate-300 leading-relaxed">
+          <p class="text-[11px] text-slate-300 leading-tight">
             Acima de 200% de Agressividade, o enxame dobra (2x, até 1.200
-            monstros) com tempestade carmesim e bônus massivo de moedas!
+            monstros) com tempestade carmesim!
           </p>
         </div>
       </div>
 
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-2.5">
         <button
           id="btnStartWithCutscene"
-          class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r
+          class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r
                  from-cyan-500 to-emerald-500 hover:from-cyan-400
                  hover:to-emerald-400 text-slate-950 font-orbitron font-black
-                 text-sm md:text-base tracking-wider shadow-xl transition
-                 transform hover:scale-105 active:scale-95"
+                 text-xs sm:text-sm tracking-wider shadow-xl transition"
         >
-          <i class="fa-solid fa-play mr-2"></i>
+          <i class="fa-solid fa-play mr-1.5"></i>
           INICIAR (COM PRÓLOGO)
         </button>
 
         <button
           id="btnStartDirect"
-          class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-slate-800
+          class="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-800
                  hover:bg-slate-700 text-cyan-300 border border-cyan-500/40
-                 font-orbitron font-bold text-xs md:text-sm transition"
+                 font-orbitron font-bold text-xs transition"
         >
           <i class="fa-solid fa-bolt mr-1"></i>
           COMBATE DIRETO
@@ -827,41 +831,40 @@
     </div>
   </div>
 
-  <!-- Modal de Subida de Nível (3 Cartas de Evolução) -->
+  <!-- Modal de Subida de Nível Compacto para Mobile & Desktop -->
   <div
     id="levelUpModal"
     class="fixed inset-0 z-40 hidden items-center justify-center
-           bg-slate-950/85 backdrop-blur-md p-4"
+           bg-slate-950/85 backdrop-blur-md p-2.5 sm:p-4"
   >
     <div
       class="max-w-3xl w-full bg-slate-900/95 border-2 border-cyan-400/60
-             rounded-3xl p-5 sm:p-6 text-center shadow-2xl glow-cyan
-             max-h-[92vh] flex flex-col"
+             rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 text-center shadow-2xl
+             glow-cyan max-h-[94vh] flex flex-col"
     >
       <div
-        class="inline-flex items-center self-center gap-2 px-3 py-1
+        class="inline-flex items-center self-center gap-1.5 px-2.5 py-0.5
                rounded-full bg-amber-500/20 border border-amber-400
-               text-amber-300 text-xs font-orbitron font-bold mb-2"
+               text-amber-300 text-[10px] sm:text-xs font-orbitron font-bold mb-1"
       >
         <i class="fa-solid fa-angles-up"></i>
         <span>SUBIDA DE NÍVEL CONCLUÍDA</span>
       </div>
 
       <h2
-        class="font-orbitron text-xl sm:text-3xl font-black text-white mb-1"
+        class="font-orbitron text-base sm:text-2xl font-black text-white mb-0.5"
       >
         ESCOLHA UM APRIMORAMENTO TÁTICO
       </h2>
-      <p class="text-xs sm:text-sm text-slate-300 mb-4">
-        Armas do Herói <span class="text-emerald-400 font-bold">NÃO aumentam a dificuldade</span>.
-        Apenas <span class="text-rose-400 font-bold">Defesas da Colônia</span>
-        emitem energia que atrai o enxame!
+      <p class="text-[11px] sm:text-xs text-slate-300 mb-2.5 sm:mb-4">
+        Armas do Herói <span class="text-emerald-400 font-bold">NÃO aumentam o agro</span>.
+        Melhorias da Colônia <span class="text-rose-400 font-bold">enfurecem o enxame</span>!
       </p>
 
       <div
         id="upgradeCardsContainer"
-        class="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-left
-               overflow-y-auto custom-scroll p-1"
+        class="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-3.5 text-left
+               overflow-y-auto custom-scroll p-0.5"
       ></div>
     </div>
   </div>
@@ -870,81 +873,82 @@
   <div
     id="gameOverModal"
     class="fixed inset-0 z-50 hidden items-center justify-center
-           bg-slate-950/90 backdrop-blur-xl p-4"
+           bg-slate-950/90 backdrop-blur-xl p-3 sm:p-4"
   >
     <div
-      class="max-w-lg w-full bg-slate-900 border-2 border-rose-500
-             rounded-3xl p-6 md:p-8 text-center shadow-2xl glow-rose"
+      class="max-w-md w-full bg-slate-900 border-2 border-rose-500
+             rounded-2xl sm:rounded-3xl p-5 sm:p-7 text-center
+             shadow-2xl glow-rose"
     >
       <div
-        class="w-16 h-16 rounded-2xl bg-rose-500/20 border-2 border-rose-500
-               flex items-center justify-center text-3xl text-rose-400
-               mx-auto mb-3"
+        class="w-14 h-14 rounded-2xl bg-rose-500/20 border-2 border-rose-500
+               flex items-center justify-center text-2xl text-rose-400
+               mx-auto mb-2.5"
       >
         <i class="fa-solid fa-skull"></i>
       </div>
 
       <h2
-        class="font-orbitron text-2xl md:text-3xl font-black
+        class="font-orbitron text-xl sm:text-3xl font-black
                text-rose-400 neon-text-rose mb-1"
       >
         COLÔNIA SOBREPUJADA
       </h2>
-      <p id="gameOverReason" class="text-sm text-slate-300 mb-5">
+      <p id="gameOverReason" class="text-xs sm:text-sm text-slate-300 mb-4">
         O Centro de Comando foi destruído pela horda.
       </p>
 
       <div
-        class="grid grid-cols-2 gap-3 bg-slate-950/80 rounded-2xl p-4
-               border border-slate-800 mb-6 text-left"
+        class="grid grid-cols-2 gap-2.5 bg-slate-950/80 rounded-xl p-3.5
+               border border-slate-800 mb-5 text-left"
       >
         <div>
-          <div class="text-[10px] text-slate-400 uppercase font-orbitron">
+          <div class="text-[9px] text-slate-400 uppercase font-orbitron">
             Tempo Sobrevivido
           </div>
           <div
             id="statTime"
-            class="font-orbitron text-lg font-bold text-white"
+            class="font-orbitron text-base sm:text-lg font-bold text-white"
           >00:00</div>
         </div>
         <div>
-          <div class="text-[10px] text-slate-400 uppercase font-orbitron">
+          <div class="text-[9px] text-slate-400 uppercase font-orbitron">
             Infectados Abatidos
           </div>
           <div
             id="statKills"
-            class="font-orbitron text-lg font-bold text-emerald-400"
+            class="font-orbitron text-base sm:text-lg font-bold text-emerald-400"
           >0</div>
         </div>
         <div>
-          <div class="text-[10px] text-slate-400 uppercase font-orbitron">
+          <div class="text-[9px] text-slate-400 uppercase font-orbitron">
             Nível do Comandante
           </div>
           <div
             id="statLevel"
-            class="font-orbitron text-lg font-bold text-cyan-400"
+            class="font-orbitron text-base sm:text-lg font-bold text-cyan-400"
           >1</div>
         </div>
         <div>
-          <div class="text-[10px] text-slate-400 uppercase font-orbitron">
+          <div class="text-[9px] text-slate-400 uppercase font-orbitron">
             Agressividade Máx.
           </div>
           <div
             id="statAggro"
-            class="font-orbitron text-lg font-bold text-rose-400"
+            class="font-orbitron text-base sm:text-lg font-bold text-rose-400"
           >100%</div>
         </div>
       </div>
 
       <button
         id="btnRestartGame"
-        class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-rose-600
+        class="w-full py-3 rounded-xl bg-gradient-to-r from-rose-600
                to-amber-500 hover:from-rose-500 hover:to-amber-400
-               text-white font-orbitron font-black text-sm tracking-wider
-               shadow-xl transition"
+               text-white font-orbitron font-black text-xs sm:text-sm
+               tracking-wider shadow-xl transition"
       >
         <i class="fa-solid fa-rotate-right mr-2"></i>
-        REINICIAR PROTOCOLO DE DEFESA
+        TENTAR NOVAMENTE
       </button>
     </div>
   </div>
@@ -973,7 +977,7 @@
         }
       }
 
-      playTone(freqStart, freqEnd, duration, type = 'triangle', vol = 0.06) {
+      playTone(freqStart, freqEnd, duration, type = 'triangle', vol = 0.05) {
         if (this.muted || !this.ctx) return;
         try {
           const now = this.ctx.currentTime;
@@ -995,23 +999,23 @@
       }
 
       playShoot() {
-        this.playTone(520, 120, 0.06, 'sawtooth', 0.045);
+        this.playTone(520, 120, 0.055, 'sawtooth', 0.04);
       }
 
       playPlasma() {
-        this.playTone(860, 210, 0.1, 'sine', 0.06);
+        this.playTone(860, 210, 0.09, 'sine', 0.055);
       }
 
       playFlame() {
-        this.playTone(190, 65, 0.07, 'triangle', 0.035);
+        this.playTone(190, 65, 0.065, 'triangle', 0.03);
       }
 
       playCryo() {
-        this.playTone(1200, 620, 0.14, 'sine', 0.05);
+        this.playTone(1200, 620, 0.12, 'sine', 0.045);
       }
 
       playExplosion() {
-        this.playTone(135, 26, 0.36, 'sawtooth', 0.14);
+        this.playTone(135, 26, 0.34, 'sawtooth', 0.13);
       }
 
       playCoin() {
@@ -1023,12 +1027,12 @@
           osc.type = 'sine';
           osc.frequency.setValueAtTime(980, now);
           osc.frequency.setValueAtTime(1340, now + 0.04);
-          gain.gain.setValueAtTime(0.055, now);
-          gain.gain.linearRampToValueAtTime(0.001, now + 0.1);
+          gain.gain.setValueAtTime(0.05, now);
+          gain.gain.linearRampToValueAtTime(0.001, now + 0.09);
           osc.connect(gain);
           gain.connect(this.ctx.destination);
           osc.start(now);
-          osc.stop(now + 0.1);
+          osc.stop(now + 0.09);
         } catch (err) {}
       }
 
@@ -1037,7 +1041,7 @@
         const notes = [440, 554, 659, 880];
         notes.forEach((n, idx) => {
           setTimeout(() => {
-            this.playTone(n, n * 1.02, 0.15, 'triangle', 0.08);
+            this.playTone(n, n * 1.02, 0.14, 'triangle', 0.075);
           }, idx * 65);
         });
       }
@@ -1050,14 +1054,14 @@
           const gain = this.ctx.createGain();
           osc.type = 'sawtooth';
           osc.frequency.setValueAtTime(210, now);
-          osc.frequency.linearRampToValueAtTime(430, now + 0.32);
-          osc.frequency.linearRampToValueAtTime(180, now + 0.68);
-          gain.gain.setValueAtTime(0.11, now);
-          gain.gain.linearRampToValueAtTime(0.001, now + 0.7);
+          osc.frequency.linearRampToValueAtTime(430, now + 0.3);
+          osc.frequency.linearRampToValueAtTime(180, now + 0.65);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.linearRampToValueAtTime(0.001, now + 0.68);
           osc.connect(gain);
           gain.connect(this.ctx.destination);
           osc.start(now);
-          osc.stop(now + 0.7);
+          osc.stop(now + 0.68);
         } catch (err) {}
       }
 
@@ -1066,10 +1070,10 @@
         const notes = [140, 280, 560, 1120];
         notes.forEach((freq, idx) => {
           setTimeout(() => {
-            this.playTone(freq, freq * 0.8, 0.24, 'sawtooth', 0.09);
-          }, idx * 75);
+            this.playTone(freq, freq * 0.8, 0.22, 'sawtooth', 0.085);
+          }, idx * 70);
         });
-        setTimeout(() => this.playExplosion(), 160);
+        setTimeout(() => this.playExplosion(), 150);
       }
     }
 
@@ -1077,7 +1081,7 @@
 
     /**
      * ========================================================================
-     * 2. CONSTANTES DO MUNDO, MONSTROS E TORRETAS
+     * 2. CONSTANTES DO MUNDO, MONSTROS (DESAFIO ELEVADO) E DEFESAS
      * ========================================================================
      */
     const WORLD_SIZE = 5000;
@@ -1086,67 +1090,67 @@
     const ENEMY_TYPES = {
       crawler: {
         name: 'Infectado Rastejante',
-        hp: 30,
-        speed: 86,
+        hp: 42,
+        speed: 96,
         radius: 11.5,
-        dmg: 9,
-        xp: 5,
-        scrapChance: 0.55,
+        dmg: 14,
+        xp: 3,
+        scrapChance: 0.45,
         color: '#94a3b8',
         core: '#475569'
       },
       runner: {
         name: 'Corredor Enraivecido',
-        hp: 20,
-        speed: 158,
+        hp: 28,
+        speed: 172,
         radius: 9.5,
-        dmg: 12,
-        xp: 7,
-        scrapChance: 0.60,
+        dmg: 18,
+        xp: 4,
+        scrapChance: 0.50,
         color: '#f43f5e',
         core: '#be123c'
       },
       spitter: {
         name: 'Cuspidor Venenoso',
-        hp: 46,
-        speed: 82,
+        hp: 64,
+        speed: 92,
         radius: 13,
-        dmg: 14,
-        xp: 11,
-        scrapChance: 0.70,
+        dmg: 20,
+        xp: 7,
+        scrapChance: 0.62,
         color: '#10b981',
         core: '#047857',
         ranged: true
       },
       brute: {
         name: 'Mutante Blindado',
-        hp: 220,
-        speed: 62,
+        hp: 310,
+        speed: 70,
         radius: 21,
-        dmg: 28,
-        xp: 28,
-        scrapChance: 0.90,
+        dmg: 38,
+        xp: 18,
+        scrapChance: 0.85,
         color: '#a855f7',
         core: '#6b21a8'
       },
       swarm: {
         name: 'Cria do Enxame',
-        hp: 12,
-        speed: 182,
+        hp: 16,
+        speed: 195,
         radius: 7,
-        dmg: 6,
-        xp: 3,
-        scrapChance: 0.42,
+        dmg: 9,
+        xp: 2,
+        scrapChance: 0.32,
         color: '#fbbf24',
         core: '#b45309'
       },
       titan: {
         name: 'Titã da Calamidade',
-        hp: 2100,
-        speed: 52,
+        hp: 2850,
+        speed: 58,
         radius: 38,
-        dmg: 65,
-        xp: 200,
+        dmg: 85,
+        xp: 120,
         scrapChance: 1.0,
         color: '#ef4444',
         core: '#fef08a',
@@ -1158,38 +1162,42 @@
       gatling: {
         type: 'gatling',
         name: 'Gatling Pesada',
-        cost: 30,
-        range: 340,
-        fireRate: 0.13,
-        damage: 18,
+        cost: 35,
+        hp: 180,
+        range: 330,
+        fireRate: 0.15,
+        damage: 16,
         color: '#22d3ee'
       },
       railgun: {
         type: 'railgun',
         name: 'Canhão Railgun',
-        cost: 45,
-        range: 520,
-        fireRate: 1.1,
-        damage: 115,
+        cost: 55,
+        hp: 200,
+        range: 500,
+        fireRate: 1.25,
+        damage: 110,
         pierce: 6,
         color: '#a855f7'
       },
       flame: {
         type: 'flame',
         name: 'Torreta de Chamas',
-        cost: 40,
-        range: 235,
-        fireRate: 0.09,
-        damage: 11,
+        cost: 45,
+        hp: 210,
+        range: 230,
+        fireRate: 0.1,
+        damage: 10,
         color: '#f97316'
       },
       cryo: {
         type: 'cryo',
         name: 'Torreta Criogênica',
-        cost: 35,
-        range: 290,
-        fireRate: 0.85,
-        damage: 20,
+        cost: 40,
+        hp: 190,
+        range: 280,
+        fireRate: 0.9,
+        damage: 18,
         slowDuration: 3.5,
         color: '#2dd4bf'
       }
@@ -1220,9 +1228,8 @@
         icon: 'fa-triangle-exclamation',
         color: 'rose',
         text:
-          'Lembre-se: evoluir suas armas NÃO atrai o enxame, mas instalar ' +
-          'Escudos, Patrulhas ou Barreiras Tesla na Base emitirá pulsos ' +
-          'que enfurecem a horda!'
+          'Nossos reatores suportam no máximo 6 Torretas e 4 Guardas ativos. ' +
+          'E cuidado: melhorar a Base emite pulsos que enfurecem a horda!'
       },
       {
         speaker: 'ENGENHEIRA RAMIREZ',
@@ -1231,7 +1238,7 @@
         color: 'emerald',
         text:
           'Vou entrar na Colônia e selar as comportas blindadas agora. ' +
-          'Use a sucata dourada para construir torretas e mantenha a base viva!'
+          'Posicione as defesas com sabedoria e mantenha a base viva!'
       }
     ];
 
@@ -1252,7 +1259,7 @@
     let worldScale = 1;
 
     const camControl = {
-      mode: 'angled', // 'angled' ou 'topdown'
+      mode: 'angled',
       yaw: 0,
       pitch: 0.88,
       distance: 620,
@@ -1276,7 +1283,6 @@
 
     const camera = new THREE.PerspectiveCamera(48, viewW / viewH, 10, 3800);
 
-    // Iluminação Sci-Fi
     const ambientLight = new THREE.AmbientLight(0x334155, 1.5);
     scene.add(ambientLight);
 
@@ -1291,7 +1297,6 @@
     const playerPointLight = new THREE.PointLight(0x10b981, 1.8, 480);
     scene.add(playerPointLight);
 
-    // Terreno 5000x5000 e Grade Tática
     const groundGeo = new THREE.PlaneGeometry(WORLD_SIZE, WORLD_SIZE);
     groundGeo.rotateX(-Math.PI / 2);
     const groundMat = new THREE.MeshStandardMaterial({
@@ -1314,7 +1319,6 @@
     gridHelper.material.opacity = 0.32;
     scene.add(gridHelper);
 
-    // Barreira de Perímetro 5000x5000
     const borderPoints = [
       new THREE.Vector3(0, 14, 0),
       new THREE.Vector3(WORLD_SIZE, 14, 0),
@@ -1331,7 +1335,7 @@
 
     /**
      * ========================================================================
-     * 4. MODELOS 3D DA COLÔNIA, HERÓI, RAMIREZ E POOLS INSTANCIADOS
+     * 4. MODELOS 3D DA COLÔNIA, HERÓI, GUARDAS E POOLS INSTANCIADOS
      * ========================================================================
      */
     const baseGroup = new THREE.Group();
@@ -1417,7 +1421,6 @@
     );
     baseGroup.add(baseShieldDome);
 
-    // Comportas Centrais da Colônia (Prólogo)
     const doorLeftMesh = new THREE.Mesh(
       new THREE.BoxGeometry(16, 28, 8),
       new THREE.MeshStandardMaterial({
@@ -1491,7 +1494,6 @@
     playerGunRight.position.set(12, 16, -7);
     playerGroup.add(playerGunRight);
 
-    // Anel Visual do Ímã Gravitacional
     const magnetRingGeo = new THREE.RingGeometry(0.98, 1.0, 48);
     magnetRingGeo.rotateX(-Math.PI / 2);
     const magnetRingMesh = new THREE.Mesh(
@@ -1506,7 +1508,6 @@
     magnetRingMesh.position.y = 1.5;
     scene.add(magnetRingMesh);
 
-    // Seta Indicadora da Direção da Base
     const arrowGeo = new THREE.ConeGeometry(7, 20, 4);
     arrowGeo.rotateZ(-Math.PI / 2);
     const baseIndicatorMesh = new THREE.Mesh(
@@ -1543,7 +1544,6 @@
     const tempColor = new THREE.Color();
     const projVec = new THREE.Vector3();
 
-    // Pool Instanciado de Inimigos 3D (Suporta até 1.250 na tela)
     const MAX_ENEMIES_3D = 1250;
     const enemyBodyGeo = new THREE.DodecahedronGeometry(1, 1);
     const enemyBodyMat = new THREE.MeshStandardMaterial({
@@ -1570,7 +1570,6 @@
     enemyCoresInstanced.frustumCulled = false;
     scene.add(enemyCoresInstanced);
 
-    // Pool Instanciado de Projéteis (Até 900 para suportar caos intenso)
     const MAX_BULLETS_3D = 900;
     const bulletGeo = new THREE.SphereGeometry(1, 8, 8);
     const bulletMat = new THREE.MeshBasicMaterial({});
@@ -1583,7 +1582,6 @@
     bulletsInstanced.frustumCulled = false;
     scene.add(bulletsInstanced);
 
-    // Pool Instanciado de Moedas e Super Ímãs
     const MAX_COINS_3D = 600;
     const coinGeo = new THREE.CylinderGeometry(1, 1, 0.38, 12);
     coinGeo.rotateX(Math.PI / 2);
@@ -1600,7 +1598,6 @@
     coinsInstanced.frustumCulled = false;
     scene.add(coinsInstanced);
 
-    // Pool Instanciado de Partículas 3D
     const MAX_PARTICLES_3D = 650;
     const particleGeo = new THREE.BoxGeometry(1, 1, 1);
     const particleMat = new THREE.MeshBasicMaterial({});
@@ -1653,6 +1650,64 @@
       bladeMeshes.push(bMesh);
     }
 
+    function createGuardSoldierMesh3D() {
+      const gGroup = new THREE.Group();
+
+      const body = new THREE.Mesh(
+        new THREE.CylinderGeometry(7.5, 9.5, 18, 10),
+        new THREE.MeshStandardMaterial({
+          color: 0x0284c7,
+          metalness: 0.45,
+          roughness: 0.35
+        })
+      );
+      body.position.y = 9;
+      gGroup.add(body);
+
+      const shoulders = new THREE.Mesh(
+        new THREE.BoxGeometry(18, 6, 11),
+        new THREE.MeshStandardMaterial({
+          color: 0x0369a1,
+          metalness: 0.5,
+          roughness: 0.3
+        })
+      );
+      shoulders.position.y = 14;
+      gGroup.add(shoulders);
+
+      const helmet = new THREE.Mesh(
+        new THREE.SphereGeometry(7, 12, 12),
+        new THREE.MeshStandardMaterial({
+          color: 0xe0f2fe,
+          metalness: 0.6,
+          roughness: 0.2
+        })
+      );
+      helmet.position.y = 21;
+      gGroup.add(helmet);
+
+      const visor = new THREE.Mesh(
+        new THREE.BoxGeometry(7.5, 3.8, 9),
+        new THREE.MeshBasicMaterial({ color: 0x34d399 })
+      );
+      visor.position.set(3.2, 21, 0);
+      gGroup.add(visor);
+
+      const rifle = new THREE.Mesh(
+        new THREE.BoxGeometry(16, 3.2, 3.2),
+        new THREE.MeshStandardMaterial({
+          color: 0x94a3b8,
+          metalness: 0.8,
+          roughness: 0.2
+        })
+      );
+      rifle.position.set(9, 13, 5);
+      gGroup.add(rifle);
+
+      guardsGroup.add(gGroup);
+      return gGroup;
+    }
+
     function rebuildObstacles3D(obstaclesList) {
       while (obstaclesGroup.children.length > 0) {
         obstaclesGroup.remove(obstaclesGroup.children[0]);
@@ -1677,7 +1732,7 @@
 
     /**
      * ========================================================================
-     * 5. RESPONSIVIDADE HIGH-DPI (RETINA, 1080P, 1440P, 4K, ULTRAWIDE)
+     * 5. RESPONSIVIDADE HIGH-DPI (MOBILE, 1080P, 1440P, 4K, ULTRAWIDE)
      * ========================================================================
      */
     function resizeCanvas() {
@@ -1685,10 +1740,9 @@
       viewH = window.innerHeight || 720;
       dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-      // Calibração de zoom dinâmico para Mobile, Full HD, 2K/4K e Ultrawide
       const minDim = Math.min(viewW, viewH);
       if (viewW < 640 || minDim < 580) {
-        worldScale = 0.82;
+        worldScale = 0.78;
       } else if (viewW >= 2560 || viewH >= 1440) {
         worldScale = 1.25;
       } else if (viewW >= 1920) {
@@ -1702,7 +1756,6 @@
       camera.aspect = viewW / viewH;
       camera.updateProjectionMatrix();
 
-      // Ajuste High-DPI sem distorção para o Canvas 2D de Efeitos/Texto
       fxCanvas.width = Math.floor(viewW * dpr);
       fxCanvas.height = Math.floor(viewH * dpr);
       fxCanvas.style.width = viewW + 'px';
@@ -1714,7 +1767,7 @@
 
     /**
      * ========================================================================
-     * 6. ESTADO INICIAL DA PARTIDA
+     * 6. ESTADO INICIAL DA PARTIDA (COM LIMITES DE TORRETAS E GUARDAS)
      * ========================================================================
      */
     function createInitialState() {
@@ -1746,18 +1799,20 @@
         wave: 1,
         waveTimer: 60,
         kills: 0,
-        coins: 65,
+        coins: 50,
+        maxTurrets: 6,
+        maxGuards: 4,
         maxAggroReached: 1.0,
         baseAggroBonus: 0,
         difficultyMultiplier: 1.0,
         screenShake: 0,
         spawnAccumulator: 0,
-        hordeTimer: 16,
+        hordeTimer: 14,
         bossSpawnedWaves: {},
 
         cutsceneState: {
           dialogIndex: 0,
-          phase: 'dialog', // 'dialog', 'walking', 'closing_door'
+          phase: 'dialog',
           doorOpen: 1.0,
           npc: {
             x: BASE_POS.x + 38,
@@ -1770,22 +1825,22 @@
           x: BASE_POS.x - 32,
           y: BASE_POS.y + 124,
           radius: 14,
-          hp: 120,
-          maxHp: 120,
-          regen: 1.8,
-          speed: 245,
+          hp: 110,
+          maxHp: 110,
+          regen: 0.65,
+          speed: 235,
           angle: 0,
           level: 1,
           xp: 0,
-          xpToNext: 35,
-          magnetRadius: 135,
+          xpToNext: 45,
+          magnetRadius: 125,
           damageMult: 1.0,
           fireRateMult: 1.0,
           weapons: {
             rifle: {
               level: 1,
               cooldown: 0,
-              maxCooldown: 0.19,
+              maxCooldown: 0.22,
               name: 'Fuzil Duplo',
               icon: 'fa-crosshairs',
               color: '#22d3ee'
@@ -1793,7 +1848,7 @@
             shotgun: {
               level: 0,
               cooldown: 0,
-              maxCooldown: 0.82,
+              maxCooldown: 0.88,
               name: 'Escopeta Plasma',
               icon: 'fa-burst',
               color: '#c084fc'
@@ -1810,7 +1865,7 @@
             tesla: {
               level: 0,
               cooldown: 0,
-              maxCooldown: 1.15,
+              maxCooldown: 1.25,
               name: 'Bobina Tesla',
               icon: 'fa-bolt-lightning',
               color: '#60a5fa'
@@ -1818,7 +1873,7 @@
             rockets: {
               level: 0,
               cooldown: 0,
-              maxCooldown: 1.45,
+              maxCooldown: 1.55,
               name: 'Pod de Foguetes',
               icon: 'fa-shuttle-space',
               color: '#f59e0b'
@@ -1830,8 +1885,8 @@
           x: BASE_POS.x,
           y: BASE_POS.y,
           radius: 78,
-          hp: 1500,
-          maxHp: 1500,
+          hp: 1200,
+          maxHp: 1200,
           shield: 0,
           maxShield: 0,
           shieldRegenDelay: 0,
@@ -1858,7 +1913,7 @@
 
     /**
      * ========================================================================
-     * 7. CONTROLES: TECLADO, CÂMERA 3D E JOYSTICK MULTITOQUE ISOLADO
+     * 7. CONTROLES: TECLADO, CÂMERA 3D E JOYSTICK MOBILE DINÂMICO
      * ========================================================================
      */
     const keys = {};
@@ -1877,7 +1932,8 @@
         if (k === '2') buildTurret('railgun');
         if (k === '3') buildTurret('flame');
         if (k === '4') buildTurret('cryo');
-        if (k === '5') repairBaseAction();
+        if (k === '5') hireGuardAction();
+        if (k === '6') repairBaseAction();
         if (k === 'v') toggleCameraMode();
       }
     });
@@ -1891,11 +1947,15 @@
         camControl.mode = 'topdown';
         camControl.pitch = 1.42;
         camControl.yaw = 0;
-        document.getElementById('camModeLabel').textContent = '2.5D';
+        document.querySelectorAll('.camModeLabel').forEach(el => {
+          el.textContent = '2.5D';
+        });
       } else {
         camControl.mode = 'angled';
         camControl.pitch = 0.88;
-        document.getElementById('camModeLabel').textContent = '3D';
+        document.querySelectorAll('.camModeLabel').forEach(el => {
+          el.textContent = '3D';
+        });
       }
     }
 
@@ -1936,7 +1996,7 @@
       { passive: true }
     );
 
-    // Joystick Virtual Sensível ao Toque com Isolamento de Toques Múltiplos
+    // Joystick Mobile Multitoque (Funciona no botão ou em qualquer área livre da tela)
     const joystick = {
       active: false,
       id: null,
@@ -1948,46 +2008,46 @@
     const joystickZone = document.getElementById('joystickZone');
     const joystickKnob = document.getElementById('joystickKnob');
 
-    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+    const isTouchDevice =
+      'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (isTouchDevice) {
       joystickZone.classList.remove('hidden');
     }
 
-    joystickZone.addEventListener(
-      'touchstart',
-      e => {
-        e.preventDefault();
-        for (let i = 0; i < e.changedTouches.length; i++) {
-          const t = e.changedTouches[i];
-          if (!joystick.active) {
-            const rect = joystickZone.getBoundingClientRect();
-            joystick.active = true;
-            joystick.id = t.identifier;
+    function handleTouchStart(e) {
+      if (!game.running || game.paused || game.inCutscene) return;
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        const t = e.changedTouches[i];
+        if (!joystick.active) {
+          joystick.active = true;
+          joystick.id = t.identifier;
+          const rect = joystickZone.getBoundingClientRect();
+          if (e.currentTarget === joystickZone) {
             joystick.originX = rect.left + rect.width / 2;
             joystick.originY = rect.top + rect.height / 2;
-            updateJoystickKnob(t.clientX, t.clientY);
-            break;
+          } else {
+            joystick.originX = t.clientX;
+            joystick.originY = t.clientY;
           }
+          updateJoystickKnob(t.clientX, t.clientY);
+          break;
         }
-      },
-      { passive: false }
-    );
+      }
+    }
 
-    joystickZone.addEventListener(
-      'touchmove',
-      e => {
-        e.preventDefault();
-        for (let i = 0; i < e.changedTouches.length; i++) {
-          const t = e.changedTouches[i];
-          if (joystick.active && t.identifier === joystick.id) {
-            updateJoystickKnob(t.clientX, t.clientY);
-            break;
-          }
+    function handleTouchMove(e) {
+      if (!joystick.active) return;
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        const t = e.changedTouches[i];
+        if (t.identifier === joystick.id) {
+          if (e.cancelable) e.preventDefault();
+          updateJoystickKnob(t.clientX, t.clientY);
+          break;
         }
-      },
-      { passive: false }
-    );
+      }
+    }
 
-    function endJoystickTouch(e) {
+    function handleTouchEnd(e) {
       for (let i = 0; i < e.changedTouches.length; i++) {
         const t = e.changedTouches[i];
         if (joystick.active && t.identifier === joystick.id) {
@@ -2001,13 +2061,22 @@
       }
     }
 
-    joystickZone.addEventListener('touchend', endJoystickTouch);
-    joystickZone.addEventListener('touchcancel', endJoystickTouch);
+    joystickZone.addEventListener('touchstart', handleTouchStart, {
+      passive: false
+    });
+    canvas.addEventListener('touchstart', handleTouchStart, {
+      passive: true
+    });
+    window.addEventListener('touchmove', handleTouchMove, {
+      passive: false
+    });
+    window.addEventListener('touchend', handleTouchEnd);
+    window.addEventListener('touchcancel', handleTouchEnd);
 
     function updateJoystickKnob(cx, cy) {
       const dx = cx - joystick.originX;
       const dy = cy - joystick.originY;
-      const maxR = 42;
+      const maxR = 32;
       const dist = Math.hypot(dx, dy) || 1;
       const clamped = Math.min(dist, maxR);
       const nx = dx / dist;
@@ -2043,7 +2112,7 @@
       if (game.cutsceneState.dialogIndex >= CUTSCENE_DIALOGS.length) {
         game.cutsceneState.phase = 'walking';
         document.getElementById('cutsceneText').textContent =
-          '[Ramirez caminha até as comportas centrais da Colônia e aciona o trancamento blindado...]';
+          '[Ramirez caminha até as comportas centrais e aciona o trancamento...]';
         document.getElementById('btnNextDialog').classList.add('hidden');
       } else {
         updateCutsceneDialogUI();
@@ -2058,10 +2127,10 @@
       document.getElementById('hudContainer').classList.remove('hidden');
       showBanner(
         'PROTOCOLO DE DEFESA ATIVO',
-        'Proteja o Centro de Comando e sobreviva ao enxame!',
+        'Proteja o Centro de Comando! Limite: 6 Torretas e 4 Guardas.',
         'cyan'
       );
-      spawnHordeCluster(28, true);
+      spawnHordeCluster(22, true);
       updateWeaponsHUD();
     }
 
@@ -2072,13 +2141,13 @@
       tEl.textContent = title;
       dEl.textContent = desc;
       tEl.className =
-        `font-orbitron text-xs sm:text-sm font-black tracking-wider ` +
+        `font-orbitron text-[10px] sm:text-xs font-black tracking-wider ` +
         `uppercase text-${color}-400`;
       banner.classList.remove('hidden');
       clearTimeout(banner._timer);
       banner._timer = setTimeout(() => {
         banner.classList.add('hidden');
-      }, 3800);
+      }, 2600);
     }
 
     function showBaseUpgradeBanner(moduleTitle, aggroIncrease) {
@@ -2089,39 +2158,48 @@
       const pct = Math.round(aggroIncrease * 100);
       threatEl.innerHTML =
         `<i class="fa-solid fa-triangle-exclamation mr-1"></i>` +
-        `EMISSÃO +${pct}% AGRO: O ENXAME FICOU PERMANENTEMENTE MAIS FEROZ!`;
+        `EMISSÃO +${pct}% AGRO: ENXAME MAIS AGRESSIVO!`;
       banner.classList.remove('hidden');
       clearTimeout(banner._timer);
       banner._timer = setTimeout(() => {
         banner.classList.add('hidden');
-      }, 4200);
+      }, 2800);
     }
 
-    function addFloatingText(x, y, text, color = '#ffffff', size = 13) {
-      if (game.floatingTexts.length > 90) {
+    function addFloatingText(x, y, text, color = '#ffffff', size = 12) {
+      if (game.floatingTexts.length > 75) {
         game.floatingTexts.shift();
       }
       game.floatingTexts.push({
-        x: x + (Math.random() - 0.5) * 18,
+        x: x + (Math.random() - 0.5) * 16,
         y: y,
         zOffset: 18 + Math.random() * 8,
         text,
         color,
         size,
-        life: 0.75,
-        maxLife: 0.75
+        life: 0.65,
+        maxLife: 0.65
       });
     }
 
     /**
      * ========================================================================
-     * 9. CONSTRUÇÃO DAS 4 TORRETAS E REPARO MANUAL DA BASE
+     * 9. CONSTRUÇÃO DE TORRETAS (COM LIMITE), GUARDAS E REPARO DA BASE
      * ========================================================================
      */
     function buildTurret(typeKey) {
       if (!game.running || game.paused || game.inCutscene) return;
       const spec = TURRET_SPECS[typeKey];
       if (!spec) return;
+
+      if (game.turrets.length >= game.maxTurrets) {
+        showBanner(
+          `LIMITE DE TORRETAS (${game.turrets.length}/${game.maxTurrets})`,
+          'Capacidade energética máxima de torretas atingida!',
+          'amber'
+        );
+        return;
+      }
 
       if (game.coins < spec.cost) {
         showBanner(
@@ -2134,17 +2212,20 @@
 
       game.coins -= spec.cost;
       sfx.playLevelUp();
-      game.screenShake = Math.max(game.screenShake, 0.25);
+      game.screenShake = Math.max(game.screenShake, 0.2);
 
       const angleOffset = Math.random() * Math.PI * 2;
-      const tx = game.player.x + Math.cos(angleOffset) * 22;
-      const ty = game.player.y + Math.sin(angleOffset) * 22;
+      const tx = game.player.x + Math.cos(angleOffset) * 24;
+      const ty = game.player.y + Math.sin(angleOffset) * 24;
 
       game.turrets.push({
         type: spec.type,
         name: spec.name,
         x: tx,
         y: ty,
+        hp: spec.hp,
+        maxHp: spec.hp,
+        radius: 15,
         angle: game.player.angle,
         cooldown: 0,
         recoil: 0,
@@ -2161,25 +2242,100 @@
         x: tx,
         y: ty,
         radius: 8,
-        maxRadius: 70,
+        maxRadius: 65,
         alpha: 0.9,
         color: spec.color,
         lineWidth: 4
       });
 
-      addFloatingText(tx, ty, `${spec.name.toUpperCase()}!`, spec.color, 13);
+      addFloatingText(
+        tx,
+        ty,
+        `${spec.name.toUpperCase()} (${game.turrets.length}/${game.maxTurrets})`,
+        spec.color,
+        12
+      );
       updateHUD();
+    }
+
+    function hireGuardAction() {
+      if (!game.running || game.paused || game.inCutscene) return;
+      const guardCost = 40;
+      const guards = game.base.guards;
+
+      if (guards.length >= game.maxGuards) {
+        showBanner(
+          `LIMITE DE GUARDAS (${guards.length}/${game.maxGuards})`,
+          'O esquadrão de Guardas Coloniais já está completo!',
+          'amber'
+        );
+        return;
+      }
+
+      if (game.coins < guardCost) {
+        showBanner(
+          'MOEDAS INSUFICIENTES',
+          `Requer ${guardCost} moedas para recrutar um Guarda Colonial.`,
+          'amber'
+        );
+        return;
+      }
+
+      game.coins -= guardCost;
+      sfx.playLevelUp();
+      spawnColonialGuard();
+      addFloatingText(
+        game.base.x,
+        game.base.y,
+        `GUARDA RECRUTADO (${guards.length}/${game.maxGuards})`,
+        '#34d399',
+        13
+      );
+      updateHUD();
+    }
+
+    function spawnColonialGuard() {
+      const b = game.base;
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 115 + Math.random() * 45;
+      const gx = b.x + Math.cos(angle) * dist;
+      const gy = b.y + Math.sin(angle) * dist;
+
+      b.guards.push({
+        x: gx,
+        y: gy,
+        patrolAngle: angle,
+        patrolDist: dist,
+        angle: angle,
+        hp: 160,
+        maxHp: 160,
+        radius: 11,
+        speed: 135,
+        damage: 24,
+        cooldown: 0,
+        mesh3D: null
+      });
+
+      game.shockwaves.push({
+        x: gx,
+        y: gy,
+        radius: 8,
+        maxRadius: 55,
+        alpha: 0.9,
+        color: '#34d399',
+        lineWidth: 4
+      });
     }
 
     function repairBaseAction() {
       if (!game.running || game.paused || game.inCutscene) return;
       const b = game.base;
-      const repairCost = 20;
+      const repairCost = 25;
 
       if (b.hp >= b.maxHp) {
         showBanner(
           'INTEGRIDADE MÁXIMA',
-          'O Centro de Comando já está com 100% de pontos de vida.',
+          'O Centro de Comando já está com 100% de vida.',
           'emerald'
         );
         return;
@@ -2194,26 +2350,26 @@
       }
 
       game.coins -= repairCost;
-      b.hp = Math.min(b.maxHp, b.hp + 300);
+      b.hp = Math.min(b.maxHp, b.hp + 250);
       sfx.playLevelUp();
 
       game.shockwaves.push({
         x: b.x,
         y: b.y,
         radius: 45,
-        maxRadius: 190,
+        maxRadius: 175,
         alpha: 0.95,
         color: '#10b981',
         lineWidth: 6
       });
 
-      addFloatingText(b.x, b.y, '+300 HP COLÔNIA', '#34d399', 15);
+      addFloatingText(b.x, b.y, '+250 HP COLÔNIA', '#34d399', 14);
       updateHUD();
     }
 
     /**
      * ========================================================================
-     * 10. GERAÇÃO CAÓTICA DE MONSTROS, MATILHAS E ATAQUES EM PINÇA
+     * 10. GERAÇÃO CAÓTICA E DESAFIADORA DE MONSTROS E ATAQUES EM PINÇA
      * ========================================================================
      */
     function getHyperMultiplier() {
@@ -2221,19 +2377,19 @@
     }
 
     function getCoinBonusMultiplier() {
-      return 1 + (game.difficultyMultiplier - 1) * 1.35;
+      return 1 + (game.difficultyMultiplier - 1) * 1.15;
     }
 
     function spawnSingleEnemy(typeKey, x, y) {
       const hyperMult = getHyperMultiplier();
-      const maxCap = Math.round(600 * hyperMult); // 600 normal, 1200 na Hiper-Infestação
+      const maxCap = Math.round(600 * hyperMult);
       if (game.enemies.length >= maxCap) return;
 
       const spec = ENEMY_TYPES[typeKey] || ENEMY_TYPES.crawler;
       const aggroDelta = Math.max(0, game.difficultyMultiplier - 1);
-      const hpScale = 1 + aggroDelta * 0.72;
-      const speedScale = 1 + Math.min(0.55, aggroDelta * 0.16);
-      const dmgScale = 1 + aggroDelta * 0.45;
+      const hpScale = 1 + aggroDelta * 1.15;
+      const speedScale = 1 + Math.min(0.85, aggroDelta * 0.24);
+      const dmgScale = 1 + aggroDelta * 0.75;
 
       game.enemies.push({
         type: typeKey,
@@ -2251,22 +2407,22 @@
         coreColor: spec.core,
         ranged: !!spec.ranged,
         isBoss: !!spec.isBoss,
-        attackCooldown: 0.8 + Math.random() * 1.2,
+        attackCooldown: 0.6 + Math.random() * 1.0,
         hitFlash: 0,
         slowTimer: 0,
         burnTimer: 0,
         burnTick: 0,
-        targetBase: Math.random() < 0.44
+        targetBase: Math.random() < 0.48
       });
     }
 
-    function spawnHordeCluster(baseCount = 24, pincerAttack = true) {
+    function spawnHordeCluster(baseCount = 26, pincerAttack = true) {
       const hyperMult = getHyperMultiplier();
       const total = Math.round(baseCount * hyperMult);
       const anchor = Math.random() < 0.5 ? game.player : game.base;
 
       const flanks = pincerAttack
-        ? 2 + Math.min(3, Math.floor(game.wave / 2))
+        ? 2 + Math.min(4, Math.floor(game.wave / 2))
         : 1;
 
       const baseAngle = Math.random() * Math.PI * 2;
@@ -2275,20 +2431,20 @@
       for (let f = 0; f < flanks; f++) {
         const angle =
           baseAngle + (Math.PI * 2 * f) / flanks + (Math.random() - 0.5) * 0.35;
-        const dist = 540 + Math.random() * 260;
+        const dist = 510 + Math.random() * 240;
         const clusterX = anchor.x + Math.cos(angle) * dist;
         const clusterY = anchor.y + Math.sin(angle) * dist;
 
         for (let i = 0; i < perFlank; i++) {
           const r = Math.random();
           let type = 'crawler';
-          if (r < 0.35) type = 'swarm';
+          if (r < 0.32) type = 'swarm';
           else if (r < 0.62) type = 'runner';
-          else if (game.wave >= 2 && r < 0.78) type = 'spitter';
-          else if (game.wave >= 3 && r < 0.90) type = 'brute';
+          else if (r < 0.80) type = 'spitter';
+          else if (game.wave >= 2 && r < 0.94) type = 'brute';
 
-          const ox = clusterX + (Math.random() - 0.5) * 180;
-          const oy = clusterY + (Math.random() - 0.5) * 180;
+          const ox = clusterX + (Math.random() - 0.5) * 170;
+          const oy = clusterY + (Math.random() - 0.5) * 170;
           spawnSingleEnemy(type, ox, oy);
         }
       }
@@ -2304,15 +2460,14 @@
         id: 'rifle_up',
         title: 'Fuzil Duplo de Alta Cadência',
         category: 'ARMA DO HERÓI',
-        rarity: 'Raro',
         isBase: false,
         icon: 'fa-gun',
         color: 'cyan',
-        desc: 'Aumenta a cadência de tiro em +18%, o dano e adiciona canos extras de plasma.',
+        desc: 'Aumenta a cadência de tiro em +16%, o dano e adiciona canos extras.',
         apply: g => {
           g.player.weapons.rifle.level++;
           g.player.weapons.rifle.maxCooldown = Math.max(
-            0.08,
+            0.09,
             g.player.weapons.rifle.maxCooldown * 0.86
           );
         }
@@ -2321,11 +2476,10 @@
         id: 'shotgun_up',
         title: 'Escopeta de Dispersão Plasma',
         category: 'ARMA DO HERÓI',
-        rarity: 'Épico',
         isBase: false,
         icon: 'fa-burst',
         color: 'purple',
-        desc: 'Dispara uma rajada cônica perfurante de projéteis de plasma de alto impacto.',
+        desc: 'Dispara uma rajada cônica perfurante de projéteis de plasma.',
         apply: g => {
           g.player.weapons.shotgun.level++;
         }
@@ -2334,11 +2488,10 @@
         id: 'blades_up',
         title: 'Lâminas Giratórias Orbitais',
         category: 'ARMA DO HERÓI',
-        rarity: 'Raro',
         isBase: false,
         icon: 'fa-fan',
         color: 'emerald',
-        desc: 'Serras de energia que giram em alta rotação triturando qualquer monstro próximo.',
+        desc: 'Serras de energia que giram em alta rotação triturando monstros.',
         apply: g => {
           g.player.weapons.blades.level++;
           g.player.weapons.blades.count = Math.min(
@@ -2351,11 +2504,10 @@
         id: 'tesla_up',
         title: 'Bobina de Choque Tesla',
         category: 'ARMA DO HERÓI',
-        rarity: 'Épico',
         isBase: false,
         icon: 'fa-bolt-lightning',
         color: 'sky',
-        desc: 'Descarrega arcos voltaicos em cadeia que eletrocutam múltiplos inimigos.',
+        desc: 'Descarrega arcos voltaicos em cadeia que eletrocutam alvos.',
         apply: g => {
           g.player.weapons.tesla.level++;
         }
@@ -2364,11 +2516,10 @@
         id: 'rockets_up',
         title: 'Pod de Foguetes Fragmentação',
         category: 'ARMA DO HERÓI',
-        rarity: 'Lendário',
         isBase: false,
         icon: 'fa-rocket',
         color: 'amber',
-        desc: 'Lança mísseis explosivos com detonação em área devastadora e estilhaços.',
+        desc: 'Lança mísseis explosivos com detonação em área devastadora.',
         apply: g => {
           g.player.weapons.rockets.level++;
         }
@@ -2377,79 +2528,72 @@
         id: 'magnet_up',
         title: 'Ímã Gravitacional & Propulsores',
         category: 'ATRIBUTO TÁTICO',
-        rarity: 'Comum',
         isBase: false,
         icon: 'fa-magnet',
         color: 'pink',
-        desc: 'Amplia o raio magnético de coleta de moedas em +60% e velocidade em +15%.',
+        desc: 'Amplia o raio magnético de moedas em +55% e velocidade em +12%.',
         apply: g => {
-          g.player.magnetRadius = Math.round(g.player.magnetRadius * 1.6);
-          g.player.speed = Math.round(g.player.speed * 1.15);
+          g.player.magnetRadius = Math.round(g.player.magnetRadius * 1.55);
+          g.player.speed = Math.round(g.player.speed * 1.12);
         }
       },
       {
         id: 'base_shield_nova',
-        title: 'Escudo Holográfico Regenerativo',
-        category: 'DEFESA DA COLÔNIA (+28% AGRO)',
-        rarity: 'Épico',
+        title: 'Escudo Holográfico +2 Capacidade',
+        category: 'DEFESA DA COLÔNIA (+30% AGRO)',
         isBase: true,
-        aggroBoost: 0.28,
+        aggroBoost: 0.30,
         icon: 'fa-shield-halved',
         color: 'cyan',
-        desc: 'Instala domo regenerativo (+500 Escudo) e dispara Nova Cinética. Provoca o enxame!',
+        desc: '+450 Escudo na Base, +2 Limite de Torretas e Nova Cinética. (+30% Agro)',
         apply: g => {
-          g.base.maxShield += 500;
+          g.base.maxShield += 450;
           g.base.shield = g.base.maxShield;
+          g.maxTurrets += 2;
           triggerBaseUpgradeOverload(
             g,
-            'Escudo Holográfico Regenerativo',
-            0.28
+            'Escudo Holográfico & Rede +2 Torretas',
+            0.30
           );
         }
       },
       {
         id: 'base_guards_patrol',
-        title: 'Patrulha Militar de Drones',
-        category: 'DEFESA DA COLÔNIA (+25% AGRO)',
-        rarity: 'Raro',
+        title: 'Esquadrão de Guardas Coloniais',
+        category: 'DEFESA DA COLÔNIA (+28% AGRO)',
         isBase: true,
-        aggroBoost: 0.25,
+        aggroBoost: 0.28,
         icon: 'fa-user-shield',
         color: 'emerald',
-        desc: 'Mobiliza +2 Guardas Coloniais armados ao redor da Base. Enfurece o enxame!',
+        desc: 'Aumenta limite em +2 Guardas e mobiliza 2 Fuzileiros imediatamente! (+28% Agro)',
         apply: g => {
-          for (let i = 0; i < 2; i++) {
-            g.base.guards.push({
-              angle: (Math.PI * 2 * g.base.guards.length) / 6,
-              dist: 122,
-              cooldown: 0
-            });
-          }
+          g.maxGuards += 2;
+          spawnColonialGuard();
+          spawnColonialGuard();
           triggerBaseUpgradeOverload(
             g,
-            'Esquadrão de Patrulha Colonial',
-            0.25
+            'Reforço de Guardas Fuzileiros',
+            0.28
           );
         }
       },
       {
         id: 'base_tesla_barrier',
         title: 'Barreira Perimetral Tesla',
-        category: 'DEFESA DA COLÔNIA (+35% AGRO)',
-        rarity: 'Lendário',
+        category: 'DEFESA DA COLÔNIA (+38% AGRO)',
         isBase: true,
-        aggroBoost: 0.35,
+        aggroBoost: 0.38,
         icon: 'fa-tower-broadcast',
         color: 'amber',
-        desc: 'Eletrocuta continuamente monstros ao redor da base e restaura +400 HP. (+35% Agro)',
+        desc: 'Eletrocuta monstros ao redor da base e restaura +350 HP. (+38% Agro)',
         apply: g => {
           g.base.teslaWallLevel++;
-          g.base.maxHp += 400;
-          g.base.hp = Math.min(g.base.maxHp, g.base.hp + 400);
+          g.base.maxHp += 350;
+          g.base.hp = Math.min(g.base.maxHp, g.base.hp + 350);
           triggerBaseUpgradeOverload(
             g,
             'Barreira Perimetral de Choque Tesla',
-            0.35
+            0.38
           );
         }
       }
@@ -2458,51 +2602,48 @@
     function triggerBaseUpgradeOverload(g, subsystemTitle, aggroIncrease) {
       g.base.defenseLevel++;
       g.baseAggroBonus += aggroIncrease;
-      g.screenShake = 1.25;
+      g.screenShake = 1.1;
       sfx.playBaseOverload();
 
-      // 1. Onda de Choque Nova Cinética Expansiva
       g.shockwaves.push({
         x: g.base.x,
         y: g.base.y,
         radius: g.base.radius,
-        maxRadius: 560,
+        maxRadius: 480,
         alpha: 1.0,
         color: '#38bdf8',
-        lineWidth: 14
+        lineWidth: 12
       });
 
-      // 2. Partículas de Erupção de Plasma
-      for (let i = 0; i < 45; i++) {
+      for (let i = 0; i < 36; i++) {
         if (g.particles.length < MAX_PARTICLES_3D) {
           const ang = Math.random() * Math.PI * 2;
-          const spd = 90 + Math.random() * 240;
+          const spd = 90 + Math.random() * 220;
           g.particles.push({
             x: g.base.x,
             y: g.base.y,
             vx: Math.cos(ang) * spd,
             vy: Math.sin(ang) * spd,
-            life: 0.7,
-            size: 5.5,
+            life: 0.65,
+            size: 5,
             color: i % 2 === 0 ? '#38bdf8' : '#2dd4bf'
           });
         }
       }
 
-      // 3. Arremessa e Vaporiza Inimigos ao Redor da Colônia
+      // Onda de choque arremessa inimigos e causa dano moderado (sem dar multi-level instantâneo)
       for (let i = g.enemies.length - 1; i >= 0; i--) {
         const e = g.enemies[i];
         const dist = Math.hypot(e.x - g.base.x, e.y - g.base.y);
-        if (dist < 540) {
+        if (dist < 480) {
           const ang = Math.atan2(e.y - g.base.y, e.x - g.base.x);
-          const knockback = e.isBoss ? 55 : 185;
+          const knockback = e.isBoss ? 45 : 160;
           e.x += Math.cos(ang) * knockback;
           e.y += Math.sin(ang) * knockback;
-          damageEnemy(e, 240, true);
+          damageEnemy(e, 95, true, false);
         }
       }
 
-      // 4. Banner Holográfico de Subsistema Online
       showBaseUpgradeBanner(subsystemTitle, aggroIncrease);
     }
 
@@ -2524,9 +2665,9 @@
           : 'border-cyan-500/50 hover:border-cyan-300';
 
         card.className =
-          `flex flex-col justify-between p-4 rounded-2xl bg-slate-950/90 ` +
-          `hover:bg-slate-900 border-2 ${borderClass} transition transform ` +
-          `hover:-translate-y-1 text-left shadow-xl`;
+          `flex flex-col justify-between p-2.5 sm:p-4 rounded-xl sm:rounded-2xl ` +
+          `bg-slate-950/90 hover:bg-slate-900 border-2 ${borderClass} ` +
+          `transition text-left shadow-xl`;
 
         const badgeClass = up.isBase
           ? 'bg-rose-950 text-rose-300 border border-rose-500/50'
@@ -2538,23 +2679,25 @@
           : '<i class="fa-solid fa-check mr-1"></i>ZERO IMPACTO NO AGRO';
 
         const footerClasses =
-          'mt-4 pt-2.5 border-t border-slate-800 flex items-center ' +
-          `justify-between text-[11px] font-orbitron font-bold ${footerColor}`;
+          'mt-2 sm:mt-3 pt-1.5 sm:pt-2 border-t border-slate-800 flex ' +
+          'items-center justify-between text-[10px] sm:text-[11px] ' +
+          `font-orbitron font-bold ${footerColor}`;
         const pillClasses =
-          `text-[10px] font-orbitron font-bold px-2 py-0.5 rounded-full ${badgeClass}`;
+          'text-[9px] sm:text-[10px] font-orbitron font-bold px-2 py-0.5 ' +
+          `rounded-full ${badgeClass}`;
 
         card.innerHTML = `
           <div>
-            <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center justify-between mb-1">
               <span class="${pillClasses}">
                 ${up.category}
               </span>
-              <i class="fa-solid ${up.icon} text-lg text-${up.color}-400"></i>
+              <i class="fa-solid ${up.icon} text-sm sm:text-lg text-${up.color}-400"></i>
             </div>
-            <h3 class="font-orbitron text-sm sm:text-base font-black text-white mb-1">
+            <h3 class="font-orbitron text-xs sm:text-base font-black text-white mb-0.5">
               ${up.title}
             </h3>
-            <p class="text-xs text-slate-300 leading-relaxed">
+            <p class="text-[11px] sm:text-xs text-slate-300 leading-snug">
               ${up.desc}
             </p>
           </div>
@@ -2587,19 +2730,19 @@
      * 12. DANO, EXPERIÊNCIA INSTANTÂNEA, MOEDAS E SUPER ÍMÃ
      * ========================================================================
      */
-    function damageEnemy(e, amount, showNumber = true) {
+    function damageEnemy(e, amount, showNumber = true, grantFullXp = true) {
       if (e._dead) return;
       e.hp -= amount;
-      e.hitFlash = 0.12;
+      e.hitFlash = 0.11;
 
-      if (showNumber && Math.random() < 0.65) {
+      if (showNumber && Math.random() < 0.55) {
         const isCrit = amount >= 65;
         addFloatingText(
           e.x,
           e.y,
           Math.round(amount).toString(),
           isCrit ? '#facc15' : '#f87171',
-          isCrit ? 15 : 12
+          isCrit ? 14 : 11
         );
       }
 
@@ -2607,30 +2750,30 @@
         e._dead = true;
         game.kills++;
 
-        // Experiência (XP) creditada automaticamente e instantaneamente ao Herói
-        game.player.xp += e.xp;
-        if (Math.random() < 0.35 || e.isBoss) {
-          addFloatingText(e.x, e.y, `+${e.xp} XP`, '#38bdf8', 12);
+        const xpGain = grantFullXp ? e.xp : Math.ceil(e.xp * 0.25);
+        game.player.xp += xpGain;
+
+        if (Math.random() < 0.28 || e.isBoss) {
+          addFloatingText(e.x, e.y, `+${xpGain} XP`, '#38bdf8', 11);
         }
 
-        while (game.player.xp >= game.player.xpToNext) {
+        if (game.player.xp >= game.player.xpToNext && !game.paused) {
           game.player.xp -= game.player.xpToNext;
           game.player.level++;
-          game.player.xpToNext = Math.round(game.player.xpToNext * 1.32 + 12);
-          game.player.maxHp += 15;
-          game.player.hp = Math.min(game.player.maxHp, game.player.hp + 35);
+          game.player.xpToNext = Math.round(game.player.xpToNext * 1.42 + 20);
+          game.player.maxHp += 12;
+          game.player.hp = Math.min(game.player.maxHp, game.player.hp + 25);
           triggerLevelUpModal();
         }
 
-        // Drop de Moedas/Sucata escalado pela dificuldade/agressividade atual
         if (Math.random() < e.scrapChance) {
           const coinMult = getCoinBonusMultiplier();
           const baseCoins = e.isBoss
-            ? 40
+            ? 35
             : e.type === 'brute'
-              ? 7
+              ? 6
               : e.type === 'spitter'
-                ? 3
+                ? 2
                 : 1;
           const finalValue = Math.max(1, Math.round(baseCoins * coinMult));
           game.coinDrops.push({
@@ -2643,8 +2786,7 @@
           });
         }
 
-        // Drop Raro de Super Ímã (puxa todas as moedas do mapa)
-        if (!e.isBoss && Math.random() < 0.01) {
+        if (!e.isBoss && Math.random() < 0.008) {
           game.coinDrops.push({
             x: e.x + 8,
             y: e.y + 8,
@@ -2655,19 +2797,18 @@
           });
         }
 
-        // Partículas 3D de Explosão Orgânica
-        const pCount = e.isBoss ? 28 : 6;
+        const pCount = e.isBoss ? 24 : 5;
         for (let p = 0; p < pCount; p++) {
           if (game.particles.length < MAX_PARTICLES_3D) {
             const a = Math.random() * Math.PI * 2;
-            const spd = 50 + Math.random() * 155;
+            const spd = 50 + Math.random() * 145;
             game.particles.push({
               x: e.x,
               y: e.y,
               vx: Math.cos(a) * spd,
               vy: Math.sin(a) * spd,
-              life: 0.45,
-              size: e.isBoss ? 6.5 : 3.5,
+              life: 0.42,
+              size: e.isBoss ? 6 : 3.2,
               color: e.color
             });
           }
@@ -2692,7 +2833,7 @@
 
     /**
      * ========================================================================
-     * 13. LOOP DE SIMULAÇÃO E COMBATE CAÓTICO
+     * 13. LOOP DE SIMULAÇÃO, GUARDAS COLONIAIS E COMBATE INTENSO
      * ========================================================================
      */
     function updateCutsceneLogic(dt) {
@@ -2735,7 +2876,6 @@
         game.screenShake = Math.max(0, game.screenShake - dt * 2.2);
       }
 
-      // Transição de Ondas Periódicas de 60 Segundos
       if (game.waveTimer <= 0) {
         game.waveTimer = 60;
         game.wave++;
@@ -2746,16 +2886,15 @@
           'Mega-horda em ataque de pinça de múltiplos ângulos!',
           'rose'
         );
-        spawnHordeCluster(36 + game.wave * 12, true);
+        spawnHordeCluster(42 + game.wave * 15, true);
 
-        // Titã da Calamidade em ondas avançadas
         if (game.wave >= 2 && !game.bossSpawnedWaves[game.wave]) {
           game.bossSpawnedWaves[game.wave] = true;
           const bossAng = Math.random() * Math.PI * 2;
           spawnSingleEnemy(
             'titan',
-            game.player.x + Math.cos(bossAng) * 620,
-            game.player.y + Math.sin(bossAng) * 620
+            game.player.x + Math.cos(bossAng) * 600,
+            game.player.y + Math.sin(bossAng) * 600
           );
           showBanner(
             'TITÃ DA CALAMIDADE DETECTADO!',
@@ -2765,9 +2904,9 @@
         }
       }
 
-      // Agressividade cresce APENAS com o tempo, ondas e melhorias de base
+      // Agressividade cresce com o tempo, ondas e melhorias de base
       const timeMinutes = game.time / 60;
-      const timeAggro = timeMinutes * 0.25 + (game.wave - 1) * 0.22;
+      const timeAggro = timeMinutes * 0.32 + (game.wave - 1) * 0.28;
       game.difficultyMultiplier = 1.0 + timeAggro + game.baseAggroBonus;
       if (game.difficultyMultiplier > game.maxAggroReached) {
         game.maxAggroReached = game.difficultyMultiplier;
@@ -2781,7 +2920,7 @@
         .getElementById('hyperInfestationBadge')
         .classList.toggle('hidden', !isHyper);
 
-      // 1. Movimentação e Regeneração do Herói
+      // 1. Movimentação do Herói
       const p = game.player;
       if (p.hp < p.maxHp) {
         p.hp = Math.min(p.maxHp, p.hp + p.regen * dt);
@@ -2821,7 +2960,6 @@
         Math.min(WORLD_SIZE - 45, p.y + moveY * p.speed * dt)
       );
 
-      // Colisão física suave com a Base Central
       const distToBase = Math.hypot(p.x - game.base.x, p.y - game.base.y);
       const minBaseDist = p.radius + game.base.radius;
       if (distToBase < minBaseDist && distToBase > 0.001) {
@@ -2832,12 +2970,11 @@
 
       // 2. Arsenal Automático do Herói
       const w = p.weapons;
-      const nearestTarget = findNearestEnemy(p.x, p.y, 500);
+      const nearestTarget = findNearestEnemy(p.x, p.y, 480);
       if (nearestTarget) {
         p.angle = Math.atan2(nearestTarget.y - p.y, nearestTarget.x - p.x);
       }
 
-      // Arma 1: Fuzil Duplo Padrão
       w.rifle.cooldown -= dt;
       if (w.rifle.cooldown <= 0 && nearestTarget) {
         w.rifle.cooldown = w.rifle.maxCooldown / p.fireRateMult;
@@ -2858,16 +2995,15 @@
             vx: Math.cos(baseAng + spread) * 720,
             vy: Math.sin(baseAng + spread) * 720,
             radius: 4,
-            damage: (20 + w.rifle.level * 7) * p.damageMult,
+            damage: (18 + w.rifle.level * 6) * p.damageMult,
             pierce: 1 + Math.floor(w.rifle.level / 3),
-            life: 0.85,
+            life: 0.8,
             color: '#22d3ee'
           });
         }
         sfx.playShoot();
       }
 
-      // Arma 2: Escopeta de Dispersão de Plasma
       if (w.shotgun.level > 0) {
         w.shotgun.cooldown -= dt;
         if (w.shotgun.cooldown <= 0 && nearestTarget) {
@@ -2882,12 +3018,12 @@
             game.bullets.push({
               x: p.x,
               y: p.y,
-              vx: Math.cos(a) * 550,
-              vy: Math.sin(a) * 550,
+              vx: Math.cos(a) * 540,
+              vy: Math.sin(a) * 540,
               radius: 5,
-              damage: (18 + w.shotgun.level * 6) * p.damageMult,
+              damage: (16 + w.shotgun.level * 6) * p.damageMult,
               pierce: 2,
-              life: 0.55,
+              life: 0.52,
               color: '#c084fc'
             });
           }
@@ -2895,7 +3031,6 @@
         }
       }
 
-      // Arma 3: Lâminas Giratórias Orbitais
       if (w.blades.level > 0) {
         w.blades.angle += dt * 4.8;
         for (let i = 0; i < w.blades.count; i++) {
@@ -2904,18 +3039,17 @@
           const by = p.y + Math.sin(a) * w.blades.radius;
           for (let j = 0; j < game.enemies.length; j++) {
             const e = game.enemies[j];
-            if (!e._dead && Math.hypot(e.x - bx, e.y - by) < e.radius + 15) {
-              damageEnemy(e, (55 + w.blades.level * 18) * dt, false);
+            if (!e._dead && Math.hypot(e.x - bx, e.y - by) < e.radius + 14) {
+              damageEnemy(e, (48 + w.blades.level * 16) * dt, false);
             }
           }
         }
       }
 
-      // Arma 4: Bobina de Choque Tesla em Cadeia
       if (w.tesla.level > 0) {
         w.tesla.cooldown -= dt;
         if (w.tesla.cooldown <= 0 && game.enemies.length > 0) {
-          const firstTarget = findNearestEnemy(p.x, p.y, 380);
+          const firstTarget = findNearestEnemy(p.x, p.y, 360);
           if (firstTarget) {
             w.tesla.cooldown = w.tesla.maxCooldown;
             const hitSet = new Set();
@@ -2936,19 +3070,18 @@
               });
               damageEnemy(
                 currTarget,
-                (38 + w.tesla.level * 14) * p.damageMult,
+                (34 + w.tesla.level * 13) * p.damageMult,
                 true
               );
               currX = currTarget.x;
               currY = currTarget.y;
-              currTarget = findNearestEnemy(currX, currY, 240, hitSet);
+              currTarget = findNearestEnemy(currX, currY, 220, hitSet);
             }
             sfx.playPlasma();
           }
         }
       }
 
-      // Arma 5: Pod de Foguetes Explosivos de Fragmentação
       if (w.rockets.level > 0) {
         w.rockets.cooldown -= dt;
         if (w.rockets.cooldown <= 0 && nearestTarget) {
@@ -2966,10 +3099,10 @@
               vx: Math.cos(baseAng + spread) * 440,
               vy: Math.sin(baseAng + spread) * 440,
               radius: 7.5,
-              damage: (70 + w.rockets.level * 28) * p.damageMult,
-              blastRadius: 105 + w.rockets.level * 12,
+              damage: (65 + w.rockets.level * 26) * p.damageMult,
+              blastRadius: 100 + w.rockets.level * 12,
               pierce: 1,
-              life: 1.25,
+              life: 1.2,
               isRocket: true,
               color: '#f59e0b'
             });
@@ -2978,23 +3111,23 @@
         }
       }
 
-      // 3. Subsistemas Defensivos da Colônia (Escudo, Guardas, Barreira Tesla)
+      // 3. Subsistemas da Colônia e Guardas Fuzileiros Coloniais
       const b = game.base;
       if (b.maxShield > 0) {
         b.shieldRegenDelay += dt;
-        if (b.shieldRegenDelay > 3.0 && b.shield < b.maxShield) {
-          b.shield = Math.min(b.maxShield, b.shield + 45 * dt);
+        if (b.shieldRegenDelay > 3.5 && b.shield < b.maxShield) {
+          b.shield = Math.min(b.maxShield, b.shield + 35 * dt);
         }
       }
 
       if (b.teslaWallLevel > 0) {
         b.teslaCooldown -= dt;
         if (b.teslaCooldown <= 0) {
-          b.teslaCooldown = 0.25;
+          b.teslaCooldown = 0.28;
           for (let i = 0; i < game.enemies.length; i++) {
             const e = game.enemies[i];
-            if (!e._dead && Math.hypot(e.x - b.x, e.y - b.y) < b.radius + 65) {
-              damageEnemy(e, 18 * b.teslaWallLevel, true);
+            if (!e._dead && Math.hypot(e.x - b.x, e.y - b.y) < b.radius + 62) {
+              damageEnemy(e, 16 * b.teslaWallLevel, true);
               game.lightningBeams.push({
                 x1: b.x,
                 y1: b.y,
@@ -3008,38 +3141,64 @@
         }
       }
 
-      b.guards.forEach((g, idx) => {
-        g.angle += dt * (1.25 + idx * 0.12);
+      // IA de Patrulha e Combate dos Guardas Coloniais
+      for (let i = b.guards.length - 1; i >= 0; i--) {
+        const g = b.guards[i];
         g.cooldown -= dt;
-        const gx = b.x + Math.cos(g.angle) * g.dist;
-        const gy = b.y + Math.sin(g.angle) * g.dist;
-        if (g.cooldown <= 0) {
-          const target = findNearestEnemy(gx, gy, 340);
-          if (target) {
-            g.cooldown = 0.36;
-            const ang = Math.atan2(target.y - gy, target.x - gx);
+
+        const nearEnemy = findNearestEnemy(g.x, g.y, 350);
+        if (nearEnemy) {
+          const distToEnemy = Math.hypot(nearEnemy.x - g.x, nearEnemy.y - g.y);
+          g.angle = Math.atan2(nearEnemy.y - g.y, nearEnemy.x - g.x);
+
+          // Mantém distância tática de tiro
+          if (distToEnemy > 165) {
+            g.x += Math.cos(g.angle) * g.speed * dt;
+            g.y += Math.sin(g.angle) * g.speed * dt;
+          } else if (distToEnemy < 95) {
+            g.x -= Math.cos(g.angle) * g.speed * 0.6 * dt;
+            g.y -= Math.sin(g.angle) * g.speed * 0.6 * dt;
+          }
+
+          if (g.cooldown <= 0) {
+            g.cooldown = 0.32;
             game.bullets.push({
-              x: gx,
-              y: gy,
-              vx: Math.cos(ang) * 620,
-              vy: Math.sin(ang) * 620,
+              x: g.x,
+              y: g.y,
+              vx: Math.cos(g.angle) * 650,
+              vy: Math.sin(g.angle) * 650,
               radius: 3.8,
-              damage: 24,
+              damage: g.damage,
               pierce: 1,
-              life: 0.75,
+              life: 0.7,
               color: '#34d399'
             });
+            sfx.playShoot();
+          }
+        } else {
+          // Patrulha circular ao redor do Centro de Comando
+          g.patrolAngle += dt * 0.85;
+          const targetX = b.x + Math.cos(g.patrolAngle) * g.patrolDist;
+          const targetY = b.y + Math.sin(g.patrolAngle) * g.patrolDist;
+          const dx = targetX - g.x;
+          const dy = targetY - g.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist > 3) {
+            g.angle = Math.atan2(dy, dx);
+            g.x += (dx / dist) * g.speed * dt;
+            g.y += (dy / dist) * g.speed * dt;
           }
         }
-      });
+      }
 
-      // 4. Disparo Caótico das 4 Torretas Construídas
-      game.turrets.forEach(t => {
+      // 4. Disparo das Torretas Construídas
+      for (let i = game.turrets.length - 1; i >= 0; i--) {
+        const t = game.turrets[i];
         t.cooldown -= dt;
         if (t.recoil > 0) t.recoil = Math.max(0, t.recoil - dt * 25);
 
         const target = findNearestEnemy(t.x, t.y, t.range);
-        if (!target) return;
+        if (!target) continue;
         t.angle = Math.atan2(target.y - t.y, target.x - t.x);
 
         if (t.cooldown <= 0) {
@@ -3047,15 +3206,14 @@
           t.recoil = 5;
 
           if (t.type === 'gatling') {
-            // Tiro contínuo duplo de alta cadência
             const perpX = -Math.sin(t.angle) * 5;
             const perpY = Math.cos(t.angle) * 5;
             for (const side of [-1, 1]) {
               game.bullets.push({
                 x: t.x + perpX * side,
                 y: t.y + perpY * side,
-                vx: Math.cos(t.angle) * 700,
-                vy: Math.sin(t.angle) * 700,
+                vx: Math.cos(t.angle) * 680,
+                vy: Math.sin(t.angle) * 680,
                 radius: 3.6,
                 damage: t.damage,
                 pierce: 1,
@@ -3065,7 +3223,6 @@
             }
             sfx.playShoot();
           } else if (t.type === 'railgun') {
-            // Disparo perfurante em linha de alta voltagem com rastro luminoso
             const endX = t.x + Math.cos(t.angle) * t.range;
             const endY = t.y + Math.sin(t.angle) * t.range;
             game.lightningBeams.push({
@@ -3073,7 +3230,7 @@
               y1: t.y,
               x2: endX,
               y2: endY,
-              life: 0.26,
+              life: 0.25,
               color: '#a855f7'
             });
             game.enemies.forEach(e => {
@@ -3092,13 +3249,12 @@
                 damageEnemy(e, t.damage, true);
               }
             });
-            game.screenShake = Math.max(game.screenShake, 0.22);
+            game.screenShake = Math.max(game.screenShake, 0.2);
             sfx.playPlasma();
           } else if (t.type === 'flame') {
-            // Projéteis incendiários em cone que aplicam queimadura contínua (Burn DOT)
             for (let f = 0; f < 3; f++) {
               const flameAng = t.angle + (Math.random() - 0.5) * 0.55;
-              const spd = 330 + Math.random() * 110;
+              const spd = 320 + Math.random() * 110;
               game.bullets.push({
                 x: t.x,
                 y: t.y,
@@ -3107,14 +3263,13 @@
                 radius: 6.5 + Math.random() * 2.5,
                 damage: t.damage,
                 pierce: 3,
-                life: 0.48,
+                life: 0.46,
                 appliesBurn: true,
                 color: Math.random() > 0.35 ? '#f97316' : '#ef4444'
               });
             }
             sfx.playFlame();
           } else if (t.type === 'cryo') {
-            // Pulsos de congelamento que causam dano e reduzem a velocidade em 55%
             game.shockwaves.push({
               x: t.x,
               y: t.y,
@@ -3133,23 +3288,22 @@
             sfx.playCryo();
           }
         }
-      });
+      }
 
-      // 5. Geração Orgânica Contínua de Matilhas e Hordas
+      // 5. Geração Intensa de Enxame e Matilhas
       const hyperMult = getHyperMultiplier();
-      const spawnRate = (4.2 + game.difficultyMultiplier * 3.1) * hyperMult;
+      const spawnRate = (5.2 + game.difficultyMultiplier * 3.8) * hyperMult;
       game.spawnAccumulator += spawnRate * dt;
 
       while (game.spawnAccumulator >= 1) {
         game.spawnAccumulator -= 1;
         const ang = Math.random() * Math.PI * 2;
-        const anchor = Math.random() < 0.58 ? p : b;
-        const dist = 540 + Math.random() * 250;
+        const anchor = Math.random() < 0.55 ? p : b;
+        const dist = 500 + Math.random() * 230;
         const r = Math.random();
 
-        if (r < 0.24) {
-          // Pacote numeroso de Crias do Enxame
-          const packCount = Math.round((4 + Math.random() * 4) * hyperMult);
+        if (r < 0.26) {
+          const packCount = Math.round((4 + Math.random() * 5) * hyperMult);
           for (let k = 0; k < packCount; k++) {
             spawnSingleEnemy(
               'swarm',
@@ -3159,9 +3313,9 @@
           }
         } else {
           let type = 'crawler';
-          if (r > 0.55) type = 'runner';
-          if (game.wave >= 2 && r > 0.80) type = 'spitter';
-          if (game.wave >= 3 && r > 0.92) type = 'brute';
+          if (r > 0.50) type = 'runner';
+          if (r > 0.76) type = 'spitter';
+          if (game.wave >= 2 && r > 0.90) type = 'brute';
           spawnSingleEnemy(
             type,
             anchor.x + Math.cos(ang) * dist,
@@ -3172,8 +3326,8 @@
 
       game.hordeTimer -= dt;
       if (game.hordeTimer <= 0) {
-        game.hordeTimer = Math.max(9, 20 - game.wave * 1.2);
-        spawnHordeCluster(18 + game.wave * 5, true);
+        game.hordeTimer = Math.max(8, 17 - game.wave * 1.2);
+        spawnHordeCluster(22 + game.wave * 6, true);
       }
 
       // 6. Atualização de Projéteis Aliados
@@ -3197,8 +3351,8 @@
             }
             if (proj.isRocket) {
               sfx.playExplosion();
-              game.screenShake = Math.max(game.screenShake, 0.3);
-              const blastR = proj.blastRadius || 105;
+              game.screenShake = Math.max(game.screenShake, 0.28);
+              const blastR = proj.blastRadius || 100;
               game.shockwaves.push({
                 x: proj.x,
                 y: proj.y,
@@ -3230,7 +3384,7 @@
         }
       }
 
-      // 7. Atualização dos Projéteis de Ácido dos Cuspidores Venenosos
+      // 7. Atualização dos Projéteis de Ácido dos Cuspidores
       for (let i = game.enemyBullets.length - 1; i >= 0; i--) {
         const eb = game.enemyBullets[i];
         eb.x += eb.vx * dt;
@@ -3244,7 +3398,7 @@
         if (Math.hypot(eb.x - p.x, eb.y - p.y) < p.radius + eb.radius) {
           p.hp -= eb.damage;
           game.screenShake = Math.max(game.screenShake, 0.25);
-          addFloatingText(p.x, p.y, `-${Math.round(eb.damage)}`, '#f43f5e', 14);
+          addFloatingText(p.x, p.y, `-${Math.round(eb.damage)}`, '#f43f5e', 13);
           game.enemyBullets.splice(i, 1);
           if (p.hp <= 0) {
             p.hp = 0;
@@ -3266,7 +3420,7 @@
         }
       }
 
-      // 8. Atualização dos Monstros (Burn DOT, 55% Cryo Slow e Ataques)
+      // 8. Atualização dos Monstros (Ataques no Herói, Base, Torretas e Guardas)
       for (let i = game.enemies.length - 1; i >= 0; i--) {
         const e = game.enemies[i];
         if (e._dead) {
@@ -3276,24 +3430,12 @@
 
         if (e.hitFlash > 0) e.hitFlash = Math.max(0, e.hitFlash - dt);
 
-        // Queimadura Contínua (Burn DOT)
         if (e.burnTimer > 0) {
           e.burnTimer -= dt;
           e.burnTick += dt;
           if (e.burnTick >= 0.25) {
             e.burnTick = 0;
             damageEnemy(e, 7, false);
-            if (game.particles.length < MAX_PARTICLES_3D && Math.random() < 0.4) {
-              game.particles.push({
-                x: e.x,
-                y: e.y,
-                vx: (Math.random() - 0.5) * 40,
-                vy: (Math.random() - 0.5) * 40,
-                life: 0.28,
-                size: 3,
-                color: '#f97316'
-              });
-            }
             if (e._dead) {
               game.enemies.splice(i, 1);
               continue;
@@ -3301,26 +3443,25 @@
           }
         }
 
-        // Redução de Velocidade em 55% pela Torreta Criogênica (multiplica por 0.45)
         const slowMult = e.slowTimer > 0 ? 0.45 : 1.0;
         if (e.slowTimer > 0) e.slowTimer -= dt;
 
         const distP = Math.hypot(p.x - e.x, p.y - e.y);
         const distB = Math.hypot(b.x - e.x, b.y - e.y);
-        const target = e.targetBase || distB < distP * 0.85 ? b : p;
+        const target = e.targetBase || distB < distP * 0.88 ? b : p;
 
         const ang = Math.atan2(target.y - e.y, target.x - e.x);
         const distTarget = Math.hypot(target.x - e.x, target.y - e.y);
 
-        if (e.ranged && distTarget < 290 && distTarget > 125) {
+        if (e.ranged && distTarget < 300 && distTarget > 120) {
           e.attackCooldown -= dt;
           if (e.attackCooldown <= 0) {
-            e.attackCooldown = 1.9;
+            e.attackCooldown = 1.65;
             game.enemyBullets.push({
               x: e.x,
               y: e.y,
-              vx: Math.cos(ang) * 300,
-              vy: Math.sin(ang) * 300,
+              vx: Math.cos(ang) * 320,
+              vy: Math.sin(ang) * 320,
               radius: 5.5,
               damage: e.dmg,
               life: 1.6
@@ -3331,9 +3472,37 @@
           e.y += Math.sin(ang) * e.speed * slowMult * dt;
         }
 
-        // Dano de Contato no Herói
+        // Dano nos Guardas Coloniais
+        for (let gIdx = b.guards.length - 1; gIdx >= 0; gIdx--) {
+          const g = b.guards[gIdx];
+          if (Math.hypot(g.x - e.x, g.y - e.y) < g.radius + e.radius) {
+            g.hp -= e.dmg * dt * 1.4;
+            if (g.hp <= 0) {
+              if (g.mesh3D) guardsGroup.remove(g.mesh3D);
+              b.guards.splice(gIdx, 1);
+              sfx.playExplosion();
+              addFloatingText(g.x, g.y, 'GUARDA ABATIDO!', '#f43f5e', 12);
+            }
+          }
+        }
+
+        // Dano nas Torretas Construídas
+        for (let tIdx = game.turrets.length - 1; tIdx >= 0; tIdx--) {
+          const t = game.turrets[tIdx];
+          if (Math.hypot(t.x - e.x, t.y - e.y) < t.radius + e.radius) {
+            t.hp -= e.dmg * dt * 1.2;
+            if (t.hp <= 0) {
+              if (t.mesh3D) turretsGroup.remove(t.mesh3D);
+              game.turrets.splice(tIdx, 1);
+              sfx.playExplosion();
+              addFloatingText(t.x, t.y, 'TORRETA DESTRUÍDA!', '#f97316', 12);
+            }
+          }
+        }
+
+        // Dano no Herói
         if (distP < p.radius + e.radius) {
-          p.hp -= e.dmg * dt * 1.5;
+          p.hp -= e.dmg * dt * 1.75;
           if (p.hp <= 0) {
             p.hp = 0;
             return triggerGameOver(
@@ -3342,9 +3511,9 @@
           }
         }
 
-        // Dano de Contato no Centro de Comando
+        // Dano no Centro de Comando
         if (distB < b.radius + e.radius) {
-          applyBaseDamage(e.dmg * dt * 1.7);
+          applyBaseDamage(e.dmg * dt * 1.9);
           if (b.hp <= 0) {
             b.hp = 0;
             return triggerGameOver(
@@ -3354,7 +3523,7 @@
         }
       }
 
-      // 9. Atração Magnética de Moedas e Pulso Elétrico do Super Ímã
+      // 9. Coleta Magnética de Moedas e Super Ímã
       for (let i = game.coinDrops.length - 1; i >= 0; i--) {
         const c = game.coinDrops[i];
         const dist = Math.hypot(p.x - c.x, p.y - c.y);
@@ -3384,13 +3553,13 @@
             });
             showBanner(
               'SUPER ÍMÃ ATIVADO!',
-              'Pulso elétrico puxando todas as moedas do mapa para o Herói!',
+              'Pulso elétrico puxando todas as moedas do mapa!',
               'amber'
             );
-            addFloatingText(p.x, p.y, 'SUPER ÍMÃ!', '#f472b6', 16);
+            addFloatingText(p.x, p.y, 'SUPER ÍMÃ!', '#f472b6', 15);
           } else {
             sfx.playCoin();
-            addFloatingText(p.x, p.y, `+${c.value} 🪙`, '#fbbf24', 12);
+            addFloatingText(p.x, p.y, `+${c.value} 🪙`, '#fbbf24', 11);
           }
           game.coins += c.value;
           game.coinDrops.splice(i, 1);
@@ -3470,13 +3639,14 @@
      */
     function updateWeaponsHUD() {
       const list = document.getElementById('weaponsList');
+      if (!list) return;
       list.innerHTML = '';
       Object.values(game.player.weapons).forEach(w => {
         if (w.level > 0) {
           const badge = document.createElement('div');
           badge.className =
-            'flex items-center gap-1.5 px-2 py-1 rounded-lg ' +
-            'bg-slate-950/90 border border-slate-700 text-xs font-bold';
+            'flex items-center gap-1 px-2 py-0.5 rounded-lg ' +
+            'bg-slate-900 border border-slate-700 text-[11px] font-bold';
           badge.innerHTML =
             `<i class="fa-solid ${w.icon}" style="color:${w.color}"></i>` +
             `<span>${w.name}</span>` +
@@ -3490,14 +3660,14 @@
       const p = game.player;
       const b = game.base;
 
-      document.getElementById('hudLevel').textContent = `NV. ${p.level}`;
+      document.getElementById('hudLevel').textContent = `NV.${p.level}`;
       document.getElementById('hudPlayerHpText').textContent =
-        `${Math.ceil(p.hp)} / ${p.maxHp}`;
+        `${Math.ceil(p.hp)}/${p.maxHp}`;
       const pHpPct = Math.max(0, (p.hp / p.maxHp) * 100);
       document.getElementById('hudPlayerHpBar').style.width = `${pHpPct}%`;
 
       document.getElementById('hudBaseHpText').textContent =
-        `${Math.ceil(b.hp)} / ${b.maxHp}`;
+        `${Math.ceil(b.hp)}/${b.maxHp}`;
       const bHpPct = Math.max(0, (b.hp / b.maxHp) * 100);
       document.getElementById('hudBaseHpBar').style.width = `${bHpPct}%`;
 
@@ -3505,12 +3675,12 @@
         b.maxShield > 0 ? Math.max(0, (b.shield / b.maxShield) * 100) : 0;
       document.getElementById('hudBaseShieldBar').style.width = `${shieldPct}%`;
       document.getElementById('hudBaseShieldText').textContent =
-        `ESCUDO: ${Math.round(b.shield)}`;
+        `(ESC: ${Math.round(b.shield)})`;
 
       document.getElementById('hudTimer').textContent = formatTime(game.time);
       document.getElementById('hudWave').textContent = `ONDA ${game.wave}`;
       document.getElementById('hudWaveCountdown').textContent =
-        formatTime(game.waveTimer);
+        `(${formatTime(game.waveTimer)})`;
 
       const aggroPct = Math.round(game.difficultyMultiplier * 100);
       document.getElementById('hudAggro').textContent = `${aggroPct}%`;
@@ -3519,19 +3689,29 @@
       if (game.baseAggroBonus > 0) {
         baseThreatTag.classList.remove('hidden');
         const basePct = Math.round(game.baseAggroBonus * 100);
-        baseThreatTag.textContent = `BASE +${basePct}%`;
+        baseThreatTag.textContent = `+${basePct}%`;
       } else {
         baseThreatTag.classList.add('hidden');
       }
 
       document.getElementById('hudXpText').textContent =
-        `${Math.floor(p.xp)} / ${p.xpToNext} XP`;
+        `${Math.floor(p.xp)}/${p.xpToNext} XP`;
       const xpPct = Math.min(100, (p.xp / p.xpToNext) * 100);
       document.getElementById('hudXpBar').style.width = `${xpPct}%`;
 
-      document.getElementById('hudCoins').textContent = Math.floor(game.coins);
+      const coinsFloor = Math.floor(game.coins);
+      document.getElementById('hudCoins').textContent = coinsFloor;
+      const coinsDesk = document.getElementById('hudCoinsDesktop');
+      if (coinsDesk) coinsDesk.textContent = coinsFloor;
+
       const coinBonus = getCoinBonusMultiplier().toFixed(1);
-      document.getElementById('hudCoinMult').textContent = `Bônus: ${coinBonus}x`;
+      document.getElementById('hudCoinMult').textContent = `${coinBonus}x`;
+
+      document.getElementById('hudTurretsCount').textContent =
+        `${game.turrets.length}/${game.maxTurrets}`;
+      document.getElementById('hudGuardsCount').textContent =
+        `${b.guards.length}/${game.maxGuards}`;
+
       document.getElementById('hudKills').textContent = game.kills;
       document.getElementById('hudEnemiesCount').textContent =
         game.enemies.length;
@@ -3669,28 +3849,13 @@
       doorLeftMesh.position.x = -8 - openOffset;
       doorRightMesh.position.x = 8 + openOffset;
 
-      // Drones/Guardas da Colônia
-      while (guardsGroup.children.length < b.guards.length) {
-        const gMesh = new THREE.Mesh(
-          new THREE.OctahedronGeometry(8.5, 0),
-          new THREE.MeshBasicMaterial({ color: 0x34d399 })
-        );
-        guardsGroup.add(gMesh);
-      }
-      for (let i = 0; i < guardsGroup.children.length; i++) {
-        const gMesh = guardsGroup.children[i];
-        const gData = b.guards[i];
-        if (gData) {
-          gMesh.visible = true;
-          gMesh.position.set(
-            b.x + Math.cos(gData.angle) * gData.dist,
-            24 + Math.sin(game.time * 5 + i) * 3,
-            b.y + Math.sin(gData.angle) * gData.dist
-          );
-          gMesh.rotation.y = game.time * 3;
-        } else {
-          gMesh.visible = false;
+      // Renderização 3D dos Guardas Fuzileiros Coloniais
+      for (const g of b.guards) {
+        if (!g.mesh3D) {
+          g.mesh3D = createGuardSoldierMesh3D();
         }
+        g.mesh3D.position.set(g.x, 0, g.y);
+        g.mesh3D.rotation.y = -g.angle;
       }
 
       playerGroup.position.set(p.x, 0, p.y);
@@ -3710,7 +3875,6 @@
         npcGroup.visible = false;
       }
 
-      // Lâminas Giratórias Orbitais
       for (let i = 0; i < bladeMeshes.length; i++) {
         if (
           p.weapons.blades.level > 0 &&
@@ -3733,13 +3897,13 @@
       }
 
       const distFromBase = Math.hypot(b.x - p.x, b.y - p.y);
-      if (distFromBase > 460 && !game.inCutscene) {
+      if (distFromBase > 440 && !game.inCutscene) {
         const angleToBase = Math.atan2(b.y - p.y, b.x - p.x);
         baseIndicatorMesh.visible = true;
         baseIndicatorMesh.position.set(
-          p.x + Math.cos(angleToBase) * 95,
+          p.x + Math.cos(angleToBase) * 90,
           18,
-          p.y + Math.sin(angleToBase) * 95
+          p.y + Math.sin(angleToBase) * 90
         );
         baseIndicatorMesh.rotation.y = -angleToBase;
       } else {
@@ -3756,7 +3920,6 @@
         t.mesh3D.userData.headGroup.position.z = Math.sin(t.angle) * rec;
       }
 
-      // InstancedMesh de Inimigos
       const enemyCount = Math.min(game.enemies.length, MAX_ENEMIES_3D);
       enemiesInstanced.count = enemyCount;
       enemyCoresInstanced.count = enemyCount;
@@ -3807,7 +3970,6 @@
         enemyCoresInstanced.instanceColor.needsUpdate = true;
       }
 
-      // InstancedMesh de Projéteis
       let bIdx = 0;
       for (let i = 0; i < game.bullets.length && bIdx < MAX_BULLETS_3D; i++) {
         const bProj = game.bullets[i];
@@ -3840,7 +4002,6 @@
         bulletsInstanced.instanceColor.needsUpdate = true;
       }
 
-      // InstancedMesh de Moedas e Super Ímãs
       const coinCount = Math.min(game.coinDrops.length, MAX_COINS_3D);
       coinsInstanced.count = coinCount;
       for (let i = 0; i < coinCount; i++) {
@@ -3870,7 +4031,6 @@
         coinsInstanced.instanceColor.needsUpdate = true;
       }
 
-      // InstancedMesh de Partículas 3D
       const ptCount = Math.min(game.particles.length, MAX_PARTICLES_3D);
       particlesInstanced.count = ptCount;
       for (let i = 0; i < ptCount; i++) {
@@ -3889,7 +4049,6 @@
         particlesInstanced.instanceColor.needsUpdate = true;
       }
 
-      // Ondas de Choque 3D
       while (shockwavesGroup.children.length > 0) {
         const child = shockwavesGroup.children[0];
         child.geometry.dispose();
@@ -3911,7 +4070,6 @@
         shockwavesGroup.add(ringMesh);
       }
 
-      // Raios Tesla e Feixes de Railgun
       while (beamsGroup.children.length > 0) {
         const child = beamsGroup.children[0];
         child.geometry.dispose();
@@ -3963,7 +4121,35 @@
         fxCtx.fillText(ft.text, sx, sy);
       }
 
-      // 2. Barra de Vida Flutuante para o Titã da Calamidade (Boss)
+      // 2. Barras de Vida Flutuantes para Torretas e Guardas Danificados
+      fxCtx.globalAlpha = 0.9;
+      for (const t of game.turrets) {
+        if (t.hp >= t.maxHp) continue;
+        projVec.set(t.x, 26, t.y);
+        projVec.project(camera);
+        if (projVec.z > 1) continue;
+        const sx = (projVec.x * 0.5 + 0.5) * viewW;
+        const sy = (-projVec.y * 0.5 + 0.5) * viewH;
+        fxCtx.fillStyle = '#0f172a';
+        fxCtx.fillRect(sx - 18, sy, 36, 4);
+        fxCtx.fillStyle = '#22d3ee';
+        fxCtx.fillRect(sx - 18, sy, 36 * Math.max(0, t.hp / t.maxHp), 4);
+      }
+
+      for (const g of game.base.guards) {
+        if (g.hp >= g.maxHp) continue;
+        projVec.set(g.x, 28, g.y);
+        projVec.project(camera);
+        if (projVec.z > 1) continue;
+        const sx = (projVec.x * 0.5 + 0.5) * viewW;
+        const sy = (-projVec.y * 0.5 + 0.5) * viewH;
+        fxCtx.fillStyle = '#0f172a';
+        fxCtx.fillRect(sx - 15, sy, 30, 4);
+        fxCtx.fillStyle = '#34d399';
+        fxCtx.fillRect(sx - 15, sy, 30 * Math.max(0, g.hp / g.maxHp), 4);
+      }
+
+      // 3. Barra de Vida Flutuante para o Titã da Calamidade (Boss)
       fxCtx.globalAlpha = 1;
       for (let i = 0; i < game.enemies.length; i++) {
         const e = game.enemies[i];
@@ -3994,6 +4180,7 @@
     }
 
     function renderMinimap() {
+      if (!minimapCtx) return;
       const mw = minimapCanvas.width;
       const mh = minimapCanvas.height;
       minimapCtx.fillStyle = '#030712';
@@ -4001,7 +4188,6 @@
 
       const scale = mw / WORLD_SIZE;
 
-      // Inimigos e Chefes
       for (let i = 0; i < game.enemies.length; i++) {
         const e = game.enemies[i];
         minimapCtx.fillStyle = e.isBoss ? '#fef08a' : '#f43f5e';
@@ -4014,13 +4200,16 @@
         );
       }
 
-      // Torretas Construídas
       minimapCtx.fillStyle = '#a855f7';
       for (const t of game.turrets) {
         minimapCtx.fillRect(t.x * scale - 1.5, t.y * scale - 1.5, 3, 3);
       }
 
-      // Centro de Comando (Base)
+      minimapCtx.fillStyle = '#34d399';
+      for (const g of game.base.guards) {
+        minimapCtx.fillRect(g.x * scale - 1.5, g.y * scale - 1.5, 2.5, 2.5);
+      }
+
       minimapCtx.fillStyle = '#06b6d4';
       minimapCtx.beginPath();
       minimapCtx.arc(
@@ -4032,7 +4221,6 @@
       );
       minimapCtx.fill();
 
-      // Herói
       minimapCtx.fillStyle = '#10b981';
       minimapCtx.beginPath();
       minimapCtx.arc(
@@ -4054,6 +4242,9 @@
       rebuildObstacles3D(game.obstacles);
       while (turretsGroup.children.length > 0) {
         turretsGroup.remove(turretsGroup.children[0]);
+      }
+      while (guardsGroup.children.length > 0) {
+        guardsGroup.remove(guardsGroup.children[0]);
       }
     }
 
@@ -4089,10 +4280,10 @@
 
       showBanner(
         'PROTOCOLO DE DEFESA ATIVO',
-        'Proteja o Centro de Comando e sobreviva ao enxame!',
+        'Proteja o Centro de Comando! Limite: 6 Torretas e 4 Guardas.',
         'cyan'
       );
-      spawnHordeCluster(28, true);
+      spawnHordeCluster(22, true);
       updateWeaponsHUD();
       updateHUD();
     }
@@ -4126,21 +4317,34 @@
       .getElementById('btnBuildCryo')
       .addEventListener('click', () => buildTurret('cryo'));
     document
+      .getElementById('btnHireGuard')
+      .addEventListener('click', hireGuardAction);
+    document
       .getElementById('btnRepairBase')
       .addEventListener('click', repairBaseAction);
+
     document
       .getElementById('btnCameraMode')
       .addEventListener('click', toggleCameraMode);
+    document
+      .getElementById('btnCameraModeDesktop')
+      .addEventListener('click', toggleCameraMode);
+
+    function toggleAudioMute() {
+      sfx.muted = !sfx.muted;
+      document.querySelectorAll('.audioIcon').forEach(icon => {
+        icon.className = sfx.muted
+          ? 'audioIcon fa-solid fa-volume-xmark text-rose-400'
+          : 'audioIcon fa-solid fa-volume-high';
+      });
+    }
 
     document
       .getElementById('btnToggleAudio')
-      .addEventListener('click', () => {
-        sfx.muted = !sfx.muted;
-        const icon = document.getElementById('audioIcon');
-        icon.className = sfx.muted
-          ? 'fa-solid fa-volume-xmark text-rose-400'
-          : 'fa-solid fa-volume-high';
-      });
+      .addEventListener('click', toggleAudioMute);
+    document
+      .getElementById('btnToggleAudioDesktop')
+      .addEventListener('click', toggleAudioMute);
 
     let lastFrameTime = performance.now();
     function gameLoop(now) {
