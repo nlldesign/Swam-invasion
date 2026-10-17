@@ -345,27 +345,31 @@
               <span id="hudCoins">50</span>
             </span>
 
-            <!-- Contador de Torretas (Limitadas) -->
-            <span
+            <!-- Contador e Expansor de Torretas (Até 20) -->
+            <button
               id="hudTurretCap"
-              class="text-cyan-300 font-bold bg-slate-900 px-1.5 py-0.5
-                     rounded border border-cyan-500/30 text-[9px] sm:text-[11px]"
-              title="Limite de Torretas Ativas"
+              class="text-cyan-300 font-bold bg-slate-900 hover:bg-slate-800
+                     px-1.5 py-0.5 rounded border border-cyan-500/40
+                     text-[9px] sm:text-[11px] transition active:scale-95"
+              title="Limite de Torretas (Clique para expandir até 20 por 55 moedas)"
             >
               <i class="fa-solid fa-tower-observation text-cyan-400 mr-0.5"></i>
               <span id="hudTurretsCount">0/6</span>
-            </span>
+              <span id="hudTurretPlus" class="text-amber-300 ml-0.5">+</span>
+            </button>
 
-            <!-- Contador de Guardas (Limitados) -->
-            <span
+            <!-- Contador e Expansor de Guardas (Até 20) -->
+            <button
               id="hudGuardCap"
-              class="text-emerald-300 font-bold bg-slate-900 px-1.5 py-0.5
-                     rounded border border-emerald-500/30 text-[9px] sm:text-[11px]"
-              title="Esquadrão de Guardas Coloniais"
+              class="text-emerald-300 font-bold bg-slate-900 hover:bg-slate-800
+                     px-1.5 py-0.5 rounded border border-emerald-500/40
+                     text-[9px] sm:text-[11px] transition active:scale-95"
+              title="Esquadrão de Guardas (Clique para expandir até 20 por 50 moedas)"
             >
               <i class="fa-solid fa-user-shield text-emerald-400 mr-0.5"></i>
               <span id="hudGuardsCount">0/4</span>
-            </span>
+              <span id="hudGuardPlus" class="text-amber-300 ml-0.5">+</span>
+            </button>
 
             <!-- Abates e Inimigos (Oculto em telas muito estreitas) -->
             <span class="hidden sm:inline text-slate-300 font-sans font-bold text-xs">
@@ -1640,7 +1644,7 @@
     );
 
     const bladeMeshes = [];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 20; i++) {
       const bMesh = new THREE.Mesh(
         new THREE.CylinderGeometry(12, 12, 2.5, 16),
         new THREE.MeshBasicMaterial({ color: 0x34d399 })
@@ -2187,15 +2191,95 @@
      * 9. CONSTRUÇÃO DE TORRETAS (COM LIMITE), GUARDAS E REPARO DA BASE
      * ========================================================================
      */
+    const MAX_CAP_LIMIT = 20;
+
+    function upgradeTurretCapacityAction() {
+      if (!game.running || game.paused || game.inCutscene) return;
+      if (game.maxTurrets >= MAX_CAP_LIMIT) {
+        showBanner(
+          'CAPACIDADE MÁXIMA (20/20)',
+          'O limite de Torretas já atingiu o valor máximo de 20 unidades!',
+          'cyan'
+        );
+        return;
+      }
+      const upCost = 55;
+      if (game.coins < upCost) {
+        showBanner(
+          'MOEDAS INSUFICIENTES',
+          `Requer ${upCost} moedas para expandir o limite de Torretas (+2 até 20).`,
+          'amber'
+        );
+        return;
+      }
+      game.coins -= upCost;
+      game.maxTurrets = Math.min(MAX_CAP_LIMIT, game.maxTurrets + 2);
+      sfx.playLevelUp();
+      addFloatingText(
+        game.player.x,
+        game.player.y,
+        `LIMITE TORRETAS: ${game.maxTurrets}/20`,
+        '#22d3ee',
+        13
+      );
+      showBanner(
+        `REDE DE TORRETAS EXPANDIDA (${game.maxTurrets}/20)`,
+        'Capacidade energética ampliada! Construa mais torretas.',
+        'cyan'
+      );
+      updateHUD();
+    }
+
+    function upgradeGuardCapacityAction() {
+      if (!game.running || game.paused || game.inCutscene) return;
+      if (game.maxGuards >= MAX_CAP_LIMIT) {
+        showBanner(
+          'CAPACIDADE MÁXIMA (20/20)',
+          'O limite de Guardas já atingiu o valor máximo de 20 soldados!',
+          'emerald'
+        );
+        return;
+      }
+      const upCost = 50;
+      if (game.coins < upCost) {
+        showBanner(
+          'MOEDAS INSUFICIENTES',
+          `Requer ${upCost} moedas para expandir o limite de Guardas (+2 até 20).`,
+          'amber'
+        );
+        return;
+      }
+      game.coins -= upCost;
+      game.maxGuards = Math.min(MAX_CAP_LIMIT, game.maxGuards + 2);
+      sfx.playLevelUp();
+      addFloatingText(
+        game.base.x,
+        game.base.y,
+        `LIMITE GUARDAS: ${game.maxGuards}/20`,
+        '#34d399',
+        13
+      );
+      showBanner(
+        `QUARTEL EXPANDIDO (${game.maxGuards}/20)`,
+        'Capacidade do esquadrão ampliada até 20 Guardas Coloniais!',
+        'emerald'
+      );
+      updateHUD();
+    }
+
     function buildTurret(typeKey) {
       if (!game.running || game.paused || game.inCutscene) return;
       const spec = TURRET_SPECS[typeKey];
       if (!spec) return;
 
       if (game.turrets.length >= game.maxTurrets) {
+        const hint =
+          game.maxTurrets < MAX_CAP_LIMIT
+            ? 'Aprimore o limite no topo ou no Level Up (até 20)!'
+            : 'Limite máximo de 20 torretas em campo atingido!';
         showBanner(
           `LIMITE DE TORRETAS (${game.turrets.length}/${game.maxTurrets})`,
-          'Capacidade energética máxima de torretas atingida!',
+          hint,
           'amber'
         );
         return;
@@ -2264,9 +2348,13 @@
       const guards = game.base.guards;
 
       if (guards.length >= game.maxGuards) {
+        const hint =
+          game.maxGuards < MAX_CAP_LIMIT
+            ? 'Aprimore o limite no topo ou no Level Up (até 20)!'
+            : 'Limite máximo de 20 Guardas Coloniais atingido!';
         showBanner(
           `LIMITE DE GUARDAS (${guards.length}/${game.maxGuards})`,
-          'O esquadrão de Guardas Coloniais já está completo!',
+          hint,
           'amber'
         );
         return;
@@ -2459,100 +2547,166 @@
       {
         id: 'rifle_up',
         title: 'Fuzil Duplo de Alta Cadência',
-        category: 'ARMA DO HERÓI',
+        category: 'ARMA DO HERÓI (ATÉ NV. 20)',
         isBase: false,
         icon: 'fa-gun',
         color: 'cyan',
         desc: 'Aumenta a cadência de tiro em +16%, o dano e adiciona canos extras.',
+        isAvailable: g => g.player.weapons.rifle.level < MAX_CAP_LIMIT,
+        getProgress: g => `Nv. ${g.player.weapons.rifle.level}/20`,
         apply: g => {
-          g.player.weapons.rifle.level++;
+          g.player.weapons.rifle.level = Math.min(
+            MAX_CAP_LIMIT,
+            g.player.weapons.rifle.level + 1
+          );
           g.player.weapons.rifle.maxCooldown = Math.max(
-            0.09,
-            g.player.weapons.rifle.maxCooldown * 0.86
+            0.07,
+            g.player.weapons.rifle.maxCooldown * 0.88
           );
         }
       },
       {
         id: 'shotgun_up',
         title: 'Escopeta de Dispersão Plasma',
-        category: 'ARMA DO HERÓI',
+        category: 'ARMA DO HERÓI (ATÉ NV. 20)',
         isBase: false,
         icon: 'fa-burst',
         color: 'purple',
         desc: 'Dispara uma rajada cônica perfurante de projéteis de plasma.',
+        isAvailable: g => g.player.weapons.shotgun.level < MAX_CAP_LIMIT,
+        getProgress: g => `Nv. ${g.player.weapons.shotgun.level}/20`,
         apply: g => {
-          g.player.weapons.shotgun.level++;
+          g.player.weapons.shotgun.level = Math.min(
+            MAX_CAP_LIMIT,
+            g.player.weapons.shotgun.level + 1
+          );
         }
       },
       {
         id: 'blades_up',
         title: 'Lâminas Giratórias Orbitais',
-        category: 'ARMA DO HERÓI',
+        category: 'ARMA DO HERÓI (ATÉ NV. 20)',
         isBase: false,
         icon: 'fa-fan',
         color: 'emerald',
-        desc: 'Serras de energia que giram em alta rotação triturando monstros.',
+        desc: 'Serras de energia que giram em alta rotação (até 20 lâminas).',
+        isAvailable: g => g.player.weapons.blades.level < MAX_CAP_LIMIT,
+        getProgress: g => `Nv. ${g.player.weapons.blades.level}/20`,
         apply: g => {
-          g.player.weapons.blades.level++;
+          g.player.weapons.blades.level = Math.min(
+            MAX_CAP_LIMIT,
+            g.player.weapons.blades.level + 1
+          );
           g.player.weapons.blades.count = Math.min(
-            10,
-            2 + g.player.weapons.blades.level * 2
+            MAX_CAP_LIMIT,
+            2 + g.player.weapons.blades.level
           );
         }
       },
       {
         id: 'tesla_up',
         title: 'Bobina de Choque Tesla',
-        category: 'ARMA DO HERÓI',
+        category: 'ARMA DO HERÓI (ATÉ NV. 20)',
         isBase: false,
         icon: 'fa-bolt-lightning',
         color: 'sky',
         desc: 'Descarrega arcos voltaicos em cadeia que eletrocutam alvos.',
+        isAvailable: g => g.player.weapons.tesla.level < MAX_CAP_LIMIT,
+        getProgress: g => `Nv. ${g.player.weapons.tesla.level}/20`,
         apply: g => {
-          g.player.weapons.tesla.level++;
+          g.player.weapons.tesla.level = Math.min(
+            MAX_CAP_LIMIT,
+            g.player.weapons.tesla.level + 1
+          );
         }
       },
       {
         id: 'rockets_up',
         title: 'Pod de Foguetes Fragmentação',
-        category: 'ARMA DO HERÓI',
+        category: 'ARMA DO HERÓI (ATÉ NV. 20)',
         isBase: false,
         icon: 'fa-rocket',
         color: 'amber',
         desc: 'Lança mísseis explosivos com detonação em área devastadora.',
+        isAvailable: g => g.player.weapons.rockets.level < MAX_CAP_LIMIT,
+        getProgress: g => `Nv. ${g.player.weapons.rockets.level}/20`,
         apply: g => {
-          g.player.weapons.rockets.level++;
+          g.player.weapons.rockets.level = Math.min(
+            MAX_CAP_LIMIT,
+            g.player.weapons.rockets.level + 1
+          );
         }
       },
       {
         id: 'magnet_up',
         title: 'Ímã Gravitacional & Propulsores',
-        category: 'ATRIBUTO TÁTICO',
+        category: 'ATRIBUTO TÁTICO (ATÉ NV. 20)',
         isBase: false,
         icon: 'fa-magnet',
         color: 'pink',
-        desc: 'Amplia o raio magnético de moedas em +55% e velocidade em +12%.',
+        desc: 'Amplia o raio magnético de moedas em +40% e velocidade em +10%.',
+        isAvailable: g => (g.player.magnetLevel || 1) < MAX_CAP_LIMIT,
+        getProgress: g => `Nv. ${g.player.magnetLevel || 1}/20`,
         apply: g => {
-          g.player.magnetRadius = Math.round(g.player.magnetRadius * 1.55);
-          g.player.speed = Math.round(g.player.speed * 1.12);
+          g.player.magnetLevel = Math.min(
+            MAX_CAP_LIMIT,
+            (g.player.magnetLevel || 1) + 1
+          );
+          g.player.magnetRadius = Math.round(g.player.magnetRadius * 1.40);
+          g.player.speed = Math.round(g.player.speed * 1.10);
+        }
+      },
+      {
+        id: 'turret_cap_up',
+        title: 'Expansão da Rede de Torretas',
+        category: 'CAPACIDADE TÁTICA (ATÉ 20)',
+        isBase: false,
+        icon: 'fa-tower-observation',
+        color: 'cyan',
+        desc: 'Aumenta o limite máximo em +2 Torretas (até 20) e repara todas as ativas!',
+        isAvailable: g => g.maxTurrets < MAX_CAP_LIMIT,
+        getProgress: g => `Limite: ${g.maxTurrets}/20`,
+        apply: g => {
+          g.maxTurrets = Math.min(MAX_CAP_LIMIT, g.maxTurrets + 2);
+          g.turrets.forEach(t => {
+            t.hp = t.maxHp;
+          });
+        }
+      },
+      {
+        id: 'guard_cap_up',
+        title: 'Expansão do Quartel de Guardas',
+        category: 'CAPACIDADE MILITAR (ATÉ 20)',
+        isBase: false,
+        icon: 'fa-people-group',
+        color: 'emerald',
+        desc: 'Aumenta o limite máximo em +2 Guardas (até 20) e recruta +1 Guarda já!',
+        isAvailable: g => g.maxGuards < MAX_CAP_LIMIT,
+        getProgress: g => `Limite: ${g.maxGuards}/20`,
+        apply: g => {
+          g.maxGuards = Math.min(MAX_CAP_LIMIT, g.maxGuards + 2);
+          if (g.base.guards.length < g.maxGuards) {
+            spawnColonialGuard();
+          }
         }
       },
       {
         id: 'base_shield_nova',
-        title: 'Escudo Holográfico +2 Capacidade',
+        title: 'Escudo Holográfico +2 Torretas',
         category: 'DEFESA DA COLÔNIA (+30% AGRO)',
         isBase: true,
         aggroBoost: 0.30,
         icon: 'fa-shield-halved',
         color: 'cyan',
-        desc: '+450 Escudo na Base, +2 Limite de Torretas e Nova Cinética. (+30% Agro)',
+        desc: '+450 Escudo na Base, +2 Limite de Torretas (até 20) e Nova Cinética.',
+        getProgress: g => `Torretas: ${g.maxTurrets}/20`,
         apply: g => {
           g.base.maxShield += 450;
           g.base.shield = g.base.maxShield;
-          g.maxTurrets += 2;
+          g.maxTurrets = Math.min(MAX_CAP_LIMIT, g.maxTurrets + 2);
           triggerBaseUpgradeOverload(
             g,
-            'Escudo Holográfico & Rede +2 Torretas',
+            'Escudo Holográfico & Rede de Torretas',
             0.30
           );
         }
@@ -2565,11 +2719,12 @@
         aggroBoost: 0.28,
         icon: 'fa-user-shield',
         color: 'emerald',
-        desc: 'Aumenta limite em +2 Guardas e mobiliza 2 Fuzileiros imediatamente! (+28% Agro)',
+        desc: 'Aumenta limite em +2 Guardas (até 20) e mobiliza 2 Fuzileiros já!',
+        getProgress: g => `Guardas: ${g.maxGuards}/20`,
         apply: g => {
-          g.maxGuards += 2;
-          spawnColonialGuard();
-          spawnColonialGuard();
+          g.maxGuards = Math.min(MAX_CAP_LIMIT, g.maxGuards + 2);
+          if (g.base.guards.length < g.maxGuards) spawnColonialGuard();
+          if (g.base.guards.length < g.maxGuards) spawnColonialGuard();
           triggerBaseUpgradeOverload(
             g,
             'Reforço de Guardas Fuzileiros',
@@ -2586,8 +2741,13 @@
         icon: 'fa-tower-broadcast',
         color: 'amber',
         desc: 'Eletrocuta monstros ao redor da base e restaura +350 HP. (+38% Agro)',
+        isAvailable: g => g.base.teslaWallLevel < MAX_CAP_LIMIT,
+        getProgress: g => `Nv. ${g.base.teslaWallLevel}/20`,
         apply: g => {
-          g.base.teslaWallLevel++;
+          g.base.teslaWallLevel = Math.min(
+            MAX_CAP_LIMIT,
+            g.base.teslaWallLevel + 1
+          );
           g.base.maxHp += 350;
           g.base.hp = Math.min(g.base.maxHp, g.base.hp + 350);
           triggerBaseUpgradeOverload(
@@ -2654,7 +2814,13 @@
       const container = document.getElementById('upgradeCardsContainer');
       container.innerHTML = '';
 
-      const shuffled = [...UPGRADE_POOL]
+      const availablePool = UPGRADE_POOL.filter(
+        up => !up.isAvailable || up.isAvailable(game)
+      );
+      const poolToUse =
+        availablePool.length >= 3 ? availablePool : UPGRADE_POOL;
+
+      const shuffled = [...poolToUse]
         .sort(() => Math.random() - 0.5)
         .slice(0, 3);
 
@@ -2686,16 +2852,21 @@
           'text-[9px] sm:text-[10px] font-orbitron font-bold px-2 py-0.5 ' +
           `rounded-full ${badgeClass}`;
 
+        const progressTag = up.getProgress ? up.getProgress(game) : '';
+
         card.innerHTML = `
           <div>
             <div class="flex items-center justify-between mb-1">
               <span class="${pillClasses}">
                 ${up.category}
               </span>
-              <i class="fa-solid ${up.icon} text-sm sm:text-lg text-${up.color}-400"></i>
+              <span class="text-[10px] font-orbitron font-bold text-amber-300">
+                ${progressTag}
+              </span>
             </div>
-            <h3 class="font-orbitron text-xs sm:text-base font-black text-white mb-0.5">
-              ${up.title}
+            <h3 class="font-orbitron text-xs sm:text-base font-black text-white mb-0.5 flex items-center gap-1.5">
+              <i class="fa-solid ${up.icon} text-${up.color}-400"></i>
+              <span>${up.title}</span>
             </h3>
             <p class="text-[11px] sm:text-xs text-slate-300 leading-snug">
               ${up.desc}
@@ -3650,7 +3821,7 @@
           badge.innerHTML =
             `<i class="fa-solid ${w.icon}" style="color:${w.color}"></i>` +
             `<span>${w.name}</span>` +
-            `<span class="text-cyan-400 font-orbitron">Nv.${w.level}</span>`;
+            `<span class="text-cyan-400 font-orbitron">Nv.${w.level}/20</span>`;
           list.appendChild(badge);
         }
       });
@@ -3711,6 +3882,15 @@
         `${game.turrets.length}/${game.maxTurrets}`;
       document.getElementById('hudGuardsCount').textContent =
         `${b.guards.length}/${game.maxGuards}`;
+
+      const tPlus = document.getElementById('hudTurretPlus');
+      if (tPlus) {
+        tPlus.classList.toggle('hidden', game.maxTurrets >= MAX_CAP_LIMIT);
+      }
+      const gPlus = document.getElementById('hudGuardPlus');
+      if (gPlus) {
+        gPlus.classList.toggle('hidden', game.maxGuards >= MAX_CAP_LIMIT);
+      }
 
       document.getElementById('hudKills').textContent = game.kills;
       document.getElementById('hudEnemiesCount').textContent =
@@ -4322,6 +4502,12 @@
     document
       .getElementById('btnRepairBase')
       .addEventListener('click', repairBaseAction);
+    document
+      .getElementById('hudTurretCap')
+      .addEventListener('click', upgradeTurretCapacityAction);
+    document
+      .getElementById('hudGuardCap')
+      .addEventListener('click', upgradeGuardCapacityAction);
 
     document
       .getElementById('btnCameraMode')
