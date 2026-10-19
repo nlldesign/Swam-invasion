@@ -1095,7 +1095,7 @@
       crawler: {
         name: 'Infectado Rastejante',
         hp: 42,
-        speed: 96,
+        speed: 72,
         radius: 11.5,
         dmg: 14,
         xp: 3,
@@ -2457,7 +2457,7 @@
 
     /**
      * ========================================================================
-     * 10. GERAÇÃO CAÓTICA E DESAFIADORA DE MONSTROS E ATAQUES EM PINÇA
+     * 10. GERAÇÃO DINÂMICA DE MONSTROS, PROGRESSÃO DE VARIEDADE E PINÇA
      * ========================================================================
      */
     function getHyperMultiplier() {
@@ -2468,6 +2468,91 @@
       return 1 + (game.difficultyMultiplier - 1) * 1.15;
     }
 
+    function getTotalUpgradesCount() {
+      if (!game || !game.player) return 0;
+      const w = game.player.weapons;
+      const weaponUps =
+        Math.max(0, w.rifle.level - 1) +
+        w.shotgun.level +
+        w.blades.level +
+        w.tesla.level +
+        w.rockets.level;
+      const magnetUps = Math.max(0, (game.player.magnetLevel || 1) - 1);
+      const capUps =
+        Math.max(0, Math.floor((game.maxTurrets - 6) / 2)) +
+        Math.max(0, Math.floor((game.maxGuards - 4) / 2));
+      const baseUps =
+        game.base.defenseLevel +
+        game.base.teslaWallLevel +
+        Math.floor((game.turrets.length + game.base.guards.length) / 2);
+      return weaponUps + magnetUps + capUps + baseUps;
+    }
+
+    function updateDynamicDifficulty() {
+      const timeMinutes = game.time / 60;
+      const totalUpgrades = getTotalUpgradesCount();
+      const playerLevelFactor = Math.max(0, game.player.level - 1) * 0.05;
+      const upgradesFactor = totalUpgrades * 0.038;
+      const baseLevelFactor =
+        game.base.defenseLevel * 0.06 + game.baseAggroBonus;
+      const timeWaveFactor = timeMinutes * 0.24 + (game.wave - 1) * 0.22;
+
+      game.difficultyMultiplier =
+        1.0 +
+        timeWaveFactor +
+        playerLevelFactor +
+        upgradesFactor +
+        baseLevelFactor;
+
+      if (game.difficultyMultiplier > game.maxAggroReached) {
+        game.maxAggroReached = game.difficultyMultiplier;
+      }
+    }
+
+    function pickDynamicEnemyType() {
+      const diff = game.difficultyMultiplier;
+      const lvl = game.player.level;
+      const ups = getTotalUpgradesCount();
+      const baseLvl =
+        game.base.defenseLevel +
+        Math.floor((game.turrets.length + game.base.guards.length) / 2);
+      const t = game.time;
+
+      // Início cadenciado acompanhando a base: 100% tipo lento (Infectado Rastejante)
+      const unlockRunner =
+        diff >= 1.16 || lvl >= 2 || ups >= 2 || baseLvl >= 1 || t >= 32;
+      const unlockSwarm =
+        diff >= 1.32 || lvl >= 3 || ups >= 4 || baseLvl >= 2 || t >= 60;
+      const unlockSpitter =
+        diff >= 1.52 || lvl >= 4 || ups >= 6 || baseLvl >= 3 || t >= 90;
+      const unlockBrute =
+        diff >= 1.75 || lvl >= 6 || ups >= 8 || game.wave >= 2 || t >= 120;
+
+      if (!unlockRunner) {
+        return 'crawler';
+      }
+
+      // Quanto maior a dificuldade/nível/upgrades/tempo, mais frenético e variado
+      const intensity = Math.min(
+        1.0,
+        Math.max(0, (diff - 1.1) * 0.65 + (lvl - 1) * 0.04 + ups * 0.025)
+      );
+      const r = Math.random();
+
+      const bruteChance = unlockBrute ? 0.06 + intensity * 0.12 : 0;
+      const spitterChance = unlockSpitter ? 0.10 + intensity * 0.14 : 0;
+      const swarmChance = unlockSwarm ? 0.14 + intensity * 0.18 : 0;
+      const runnerChance = 0.18 + intensity * 0.24;
+
+      if (r < bruteChance) return 'brute';
+      if (r < bruteChance + spitterChance) return 'spitter';
+      if (r < bruteChance + spitterChance + swarmChance) return 'swarm';
+      if (r < bruteChance + spitterChance + swarmChance + runnerChance) {
+        return 'runner';
+      }
+      return 'crawler';
+    }
+
     function spawnSingleEnemy(typeKey, x, y) {
       const hyperMult = getHyperMultiplier();
       const maxCap = Math.round(600 * hyperMult);
@@ -2476,7 +2561,8 @@
       const spec = ENEMY_TYPES[typeKey] || ENEMY_TYPES.crawler;
       const aggroDelta = Math.max(0, game.difficultyMultiplier - 1);
       const hpScale = 1 + aggroDelta * 1.15;
-      const speedScale = 1 + Math.min(0.85, aggroDelta * 0.24);
+      // Começa no ritmo natural do monstro lento e acelera conforme a dificuldade sobe
+      const speedScale = 0.88 + Math.min(1.12, aggroDelta * 0.36);
       const dmgScale = 1 + aggroDelta * 0.75;
 
       game.enemies.push({
@@ -2524,13 +2610,7 @@
         const clusterY = anchor.y + Math.sin(angle) * dist;
 
         for (let i = 0; i < perFlank; i++) {
-          const r = Math.random();
-          let type = 'crawler';
-          if (r < 0.32) type = 'swarm';
-          else if (r < 0.62) type = 'runner';
-          else if (r < 0.80) type = 'spitter';
-          else if (game.wave >= 2 && r < 0.94) type = 'brute';
-
+          const type = pickDynamicEnemyType();
           const ox = clusterX + (Math.random() - 0.5) * 170;
           const oy = clusterY + (Math.random() - 0.5) * 170;
           spawnSingleEnemy(type, ox, oy);
@@ -3075,13 +3155,8 @@
         }
       }
 
-      // Agressividade cresce com o tempo, ondas e melhorias de base
-      const timeMinutes = game.time / 60;
-      const timeAggro = timeMinutes * 0.32 + (game.wave - 1) * 0.28;
-      game.difficultyMultiplier = 1.0 + timeAggro + game.baseAggroBonus;
-      if (game.difficultyMultiplier > game.maxAggroReached) {
-        game.maxAggroReached = game.difficultyMultiplier;
-      }
+      // Regula a dificuldade por Nível do Jogador, Ameaça, Aprimoramentos, Base e Tempo
+      updateDynamicDifficulty();
 
       const isHyper = game.difficultyMultiplier >= 2.0;
       document
@@ -3461,9 +3536,10 @@
         }
       }
 
-      // 5. Geração Intensa de Enxame e Matilhas
+      // 5. Geração Progressiva de Enxame (Começa com Rastejante Lento e Fica Mais Frenético)
       const hyperMult = getHyperMultiplier();
-      const spawnRate = (5.2 + game.difficultyMultiplier * 3.8) * hyperMult;
+      const aggroDelta = Math.max(0, game.difficultyMultiplier - 1);
+      const spawnRate = (5.0 + aggroDelta * 5.2) * hyperMult;
       game.spawnAccumulator += spawnRate * dt;
 
       while (game.spawnAccumulator >= 1) {
@@ -3471,9 +3547,9 @@
         const ang = Math.random() * Math.PI * 2;
         const anchor = Math.random() < 0.55 ? p : b;
         const dist = 500 + Math.random() * 230;
-        const r = Math.random();
+        const chosenType = pickDynamicEnemyType();
 
-        if (r < 0.26) {
+        if (chosenType === 'swarm') {
           const packCount = Math.round((4 + Math.random() * 5) * hyperMult);
           for (let k = 0; k < packCount; k++) {
             spawnSingleEnemy(
@@ -3483,12 +3559,8 @@
             );
           }
         } else {
-          let type = 'crawler';
-          if (r > 0.50) type = 'runner';
-          if (r > 0.76) type = 'spitter';
-          if (game.wave >= 2 && r > 0.90) type = 'brute';
           spawnSingleEnemy(
-            type,
+            chosenType,
             anchor.x + Math.cos(ang) * dist,
             anchor.y + Math.sin(ang) * dist
           );
@@ -3497,8 +3569,10 @@
 
       game.hordeTimer -= dt;
       if (game.hordeTimer <= 0) {
-        game.hordeTimer = Math.max(8, 17 - game.wave * 1.2);
-        spawnHordeCluster(22 + game.wave * 6, true);
+        const paceCd = Math.max(6.5, 17 - aggroDelta * 3.5);
+        game.hordeTimer = paceCd;
+        const clusterSize = Math.round(22 + aggroDelta * 14 + game.wave * 4);
+        spawnHordeCluster(clusterSize, true);
       }
 
       // 6. Atualização de Projéteis Aliados
