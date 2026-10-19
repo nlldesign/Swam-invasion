@@ -1646,7 +1646,7 @@
     const bladeMeshes = [];
     for (let i = 0; i < 20; i++) {
       const bMesh = new THREE.Mesh(
-        new THREE.CylinderGeometry(12, 12, 2.5, 16),
+        new THREE.CylinderGeometry(15, 15, 3.0, 16),
         new THREE.MeshBasicMaterial({ color: 0x34d399 })
       );
       bMesh.visible = false;
@@ -1857,15 +1857,6 @@
               icon: 'fa-burst',
               color: '#c084fc'
             },
-            blades: {
-              level: 0,
-              angle: 0,
-              count: 0,
-              radius: 82,
-              name: 'Lâminas Orbitais',
-              icon: 'fa-fan',
-              color: '#34d399'
-            },
             tesla: {
               level: 0,
               cooldown: 0,
@@ -1897,6 +1888,13 @@
           defenseLevel: 0,
           teslaWallLevel: 0,
           teslaCooldown: 0,
+          blades: {
+            level: 0,
+            angle: 0,
+            count: 0,
+            radius: 115,
+            name: 'Lâminas Orbitais da Colônia'
+          },
           guards: []
         },
 
@@ -2474,7 +2472,6 @@
       const weaponUps =
         Math.max(0, w.rifle.level - 1) +
         w.shotgun.level +
-        w.blades.level +
         w.tesla.level +
         w.rockets.level;
       const magnetUps = Math.max(0, (game.player.magnetLevel || 1) - 1);
@@ -2484,6 +2481,7 @@
       const baseUps =
         game.base.defenseLevel +
         game.base.teslaWallLevel +
+        (game.base.blades ? game.base.blades.level : 0) +
         Math.floor((game.turrets.length + game.base.guards.length) / 2);
       return weaponUps + magnetUps + capUps + baseUps;
     }
@@ -2663,23 +2661,29 @@
         }
       },
       {
-        id: 'blades_up',
-        title: 'Lâminas Giratórias Orbitais',
-        category: 'ARMA DO HERÓI (ATÉ NV. 20)',
-        isBase: false,
+        id: 'base_blades_defense',
+        title: 'Lâminas Orbitais da Colônia',
+        category: 'DEFESA DA COLÔNIA (+25% AGRO)',
+        isBase: true,
+        aggroBoost: 0.25,
         icon: 'fa-fan',
         color: 'emerald',
-        desc: 'Serras de energia que giram em alta rotação (até 20 lâminas).',
-        isAvailable: g => g.player.weapons.blades.level < MAX_CAP_LIMIT,
-        getProgress: g => `Nv. ${g.player.weapons.blades.level}/20`,
+        desc: 'Serras de energia colossais orbitam o Centro de Comando triturando o enxame.',
+        isAvailable: g => g.base.blades.level < MAX_CAP_LIMIT,
+        getProgress: g => `Nv. ${g.base.blades.level}/20`,
         apply: g => {
-          g.player.weapons.blades.level = Math.min(
+          g.base.blades.level = Math.min(
             MAX_CAP_LIMIT,
-            g.player.weapons.blades.level + 1
+            g.base.blades.level + 1
           );
-          g.player.weapons.blades.count = Math.min(
+          g.base.blades.count = Math.min(
             MAX_CAP_LIMIT,
-            2 + g.player.weapons.blades.level
+            2 + g.base.blades.level
+          );
+          triggerBaseUpgradeOverload(
+            g,
+            'Lâminas Perimetrais da Colônia',
+            0.25
           );
         }
       },
@@ -3277,21 +3281,6 @@
         }
       }
 
-      if (w.blades.level > 0) {
-        w.blades.angle += dt * 4.8;
-        for (let i = 0; i < w.blades.count; i++) {
-          const a = w.blades.angle + (i * Math.PI * 2) / w.blades.count;
-          const bx = p.x + Math.cos(a) * w.blades.radius;
-          const by = p.y + Math.sin(a) * w.blades.radius;
-          for (let j = 0; j < game.enemies.length; j++) {
-            const e = game.enemies[j];
-            if (!e._dead && Math.hypot(e.x - bx, e.y - by) < e.radius + 14) {
-              damageEnemy(e, (48 + w.blades.level * 16) * dt, false);
-            }
-          }
-        }
-      }
-
       if (w.tesla.level > 0) {
         w.tesla.cooldown -= dt;
         if (w.tesla.cooldown <= 0 && game.enemies.length > 0) {
@@ -3382,6 +3371,22 @@
                 life: 0.12,
                 color: '#fbbf24'
               });
+            }
+          }
+        }
+      }
+
+      // Lâminas Orbitais Perimetrais da Base
+      if (b.blades && b.blades.level > 0) {
+        b.blades.angle += dt * 3.6;
+        for (let i = 0; i < b.blades.count; i++) {
+          const a = b.blades.angle + (i * Math.PI * 2) / b.blades.count;
+          const bx = b.x + Math.cos(a) * b.blades.radius;
+          const by = b.y + Math.sin(a) * b.blades.radius;
+          for (let j = 0; j < game.enemies.length; j++) {
+            const e = game.enemies[j];
+            if (!e._dead && Math.hypot(e.x - bx, e.y - by) < e.radius + 18) {
+              damageEnemy(e, (55 + b.blades.level * 18) * dt, false);
             }
           }
         }
@@ -4131,18 +4136,19 @@
 
       for (let i = 0; i < bladeMeshes.length; i++) {
         if (
-          p.weapons.blades.level > 0 &&
+          b.blades &&
+          b.blades.level > 0 &&
           !game.inCutscene &&
-          i < p.weapons.blades.count
+          i < b.blades.count
         ) {
           const a =
-            p.weapons.blades.angle +
-            (i * Math.PI * 2) / p.weapons.blades.count;
+            b.blades.angle +
+            (i * Math.PI * 2) / b.blades.count;
           bladeMeshes[i].visible = true;
           bladeMeshes[i].position.set(
-            p.x + Math.cos(a) * p.weapons.blades.radius,
-            14,
-            p.y + Math.sin(a) * p.weapons.blades.radius
+            b.x + Math.cos(a) * b.blades.radius,
+            16,
+            b.y + Math.sin(a) * b.blades.radius
           );
           bladeMeshes[i].rotation.y = game.time * 12;
         } else {
